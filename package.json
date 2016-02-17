@@ -1,6 +1,6 @@
 {
   "name": "laxar-angular-adapter",
-  "version": "0.1.0-pre",
+  "version": "0.1.0",
   "description": "Write LaxarJS widgets and controls with AngularJS",
   "main": "laxar-angular-adapter.js",
   "scripts": {
@@ -26,8 +26,6 @@
   "devDependencies": {
     "grunt": "~0.4.4",
     "grunt-cli": "~0.1.13",
-    "grunt-contrib-clean": "~0.6.0",
-    "grunt-contrib-watch": "~0.5.3",
     "grunt-karma": "^0.12.1",
     "grunt-laxar": "~1.0.0",
     "gruntify-eslint": "^2.0.0",
