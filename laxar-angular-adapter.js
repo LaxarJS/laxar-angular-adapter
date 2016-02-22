@@ -5,6 +5,9 @@
  */
 import ng from 'angular';
 import { assert, log } from 'laxar';
+import { name as idModuleName } from './directives/id';
+import { name as layoutModuleName } from './directives/layout';
+import { name as widgetAreaModuleName } from './directives/widget_area';
 
 let $compile;
 let $controller;
@@ -30,7 +33,9 @@ export function bootstrap( widgetModules ) {
 
    // TODO: Here we probably need to boostrap an angular app
 
-   return ng.module( 'axAngularWidgetAdapter', dependencies )
+   const directives = [ idModuleName, layoutModuleName, widgetAreaModuleName ];
+
+   return ng.module( 'axAngularWidgetAdapter', [ ...directives, ...dependencies ] )
       .run( [ '$compile', '$controller', '$rootScope', function( _$compile_, _$controller_, _$rootScope_ ) {
          $controller = _$controller_;
          $compile = _$compile_;
