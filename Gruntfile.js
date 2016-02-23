@@ -33,18 +33,21 @@ module.exports = function (grunt) {
                '/directives/': '/base/directives/',
                '/jspm_packages/': '/base/jspm_packages/',
                '/laxar-angular-adapter.js': '/base/laxar-angular-adapter.js',
+               '/profiling/': '/base/profiling/',
                '/spec/': '/base/spec/',
             },
             jspm: {
                config: 'system.config.js',
                loadFiles: [
                   'directives/spec/*_spec.js',
+                  'profiling/spec/*_spec.js',
                   'spec/*_spec.js',
                ],
                serveFiles: [
                   'directives/*.js',
                   'jspm_packages/**/*.js',
                   'laxar-angular-adapter.js',
+                  'profiling/*.js',
                   'spec/!(*_spec).js',
                ]
             }
@@ -57,7 +60,12 @@ module.exports = function (grunt) {
          options: {
             config: '.eslintrc.json'
          },
-         src: [ 'directives/**/*.js', 'laxar-angular-adapter.js', 'spec/*.js' ]
+         src: [
+            'directives/**/*.js',
+            'laxar-angular-adapter.js',
+            'profiling/**/*.js',
+            'spec/*.js'
+         ]
       }
    } );
 

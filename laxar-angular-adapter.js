@@ -8,6 +8,7 @@ import { assert, log } from 'laxar';
 import { name as idModuleName } from './directives/id';
 import { name as layoutModuleName } from './directives/layout';
 import { name as widgetAreaModuleName } from './directives/widget_area';
+import { name as profilingModuleName } from './profiling/profiling';
 
 let $compile;
 let $controller;
@@ -20,7 +21,7 @@ export const technology = 'angular';
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export function bootstrap( widgetModules ) {
-   const dependencies = ( widgetModules || [] ).map( module => {
+   const externalDependencies = ( widgetModules || [] ).map( module => {
       // for lookup, use a normalized module name that can also be derived from the widget.json name:
       const moduleKey = normalize( module.name );
       controllerNames[ moduleKey ] = capitalize( module.name ) + 'Controller';
@@ -32,10 +33,16 @@ export function bootstrap( widgetModules ) {
    } );
 
    // TODO: Here we probably need to boostrap an angular app
+   // See issue https://github.com/LaxarJS/laxar-angular-adapter/issues/3
 
-   const directives = [ idModuleName, layoutModuleName, widgetAreaModuleName ];
+   const internalDependencies = [
+      idModuleName,
+      layoutModuleName,
+      widgetAreaModuleName,
+      profilingModuleName
+   ];
 
-   return ng.module( 'axAngularWidgetAdapter', [ ...directives, ...dependencies ] )
+   return ng.module( 'axAngularWidgetAdapter', [ ...internalDependencies, ...externalDependencies ] )
       .run( [ '$compile', '$controller', '$rootScope', function( _$compile_, _$controller_, _$rootScope_ ) {
          $controller = _$controller_;
          $compile = _$compile_;
