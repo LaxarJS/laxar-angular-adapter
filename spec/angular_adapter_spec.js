@@ -18,23 +18,23 @@ const { module, inject } = window;
 paths.WIDGETS = 'the_widgets';
 paths.THEMES = 'the_themes';
 
-var defaultCssAssetPath_ = 'the_themes/default.theme/test/test_widget/css/test_widget.css';
-var themeCssAssetPath_ = 'the_themes/blue.theme/test/test_widget/css/test_widget.css';
-var htmlAssetPath_ = 'the_widgets/test/test_widget/default.theme/test_widget.html';
-var assets = {
+const defaultCssAssetPath_ = 'the_themes/default.theme/test/test_widget/css/test_widget.css';
+const themeCssAssetPath_ = 'the_themes/blue.theme/test/test_widget/css/test_widget.css';
+const htmlAssetPath_ = 'the_widgets/test/test_widget/default.theme/test_widget.html';
+const assets = {
    [ themeCssAssetPath_ ]: 'h1 { color: blue }',
    [ defaultCssAssetPath_ ]: 'h1 { color: #ccc }',
    [ htmlAssetPath_ ]: '<h1>hello there<i ng-if="false"></i></h1>',
 };
 
-var widgetSpec_;
-var widgetConfiguration_;
-var widgetFeatures_;
-var anchor_;
+let widgetSpec_;
+let widgetConfiguration_;
+let widgetFeatures_;
+let anchor_;
 
-var fileResourceProvider_;
-var assetResolver_;
-var widgetServices_;
+let fileResourceProvider_;
+let assetResolver_;
+let widgetServices_;
 
 beforeEach( () => {
 
@@ -44,14 +44,13 @@ beforeEach( () => {
    function throwError( msg ) { throw new Error( msg ); }
    widgetFeatures_ = features.featuresForWidget( widgetSpec_, widgetConfiguration_, throwError );
 
-   anchor_ = document.createElement( 'DIV' );
+   anchor_ = document.createElement( 'div' );
 
    fileResourceProvider_ = createFrpMock( assets );
    assetResolver_ = {
       loadCss: jasmine.createSpy( 'loadCss' ),
-      provide: jasmine.createSpy( 'provide' ).and.callFake( function( url ) {
-         return fileResourceProvider_.provide( url );
-      } ),
+      provide: jasmine.createSpy( 'provide' )
+         .and.callFake( url => fileResourceProvider_.provide( url ) ),
       resolve: jasmine.createSpy( 'resolve' ).and.callFake( () => {
          return q.when( {
             templateUrl: htmlAssetPath_,
@@ -61,7 +60,7 @@ beforeEach( () => {
    };
 
    widgetServices_ = {
-      idGenerator: () => { return 'fake-id'; },
+      idGenerator: () => 'fake-id',
       eventBus: createEventBusMock( q ),
       release: jasmine.createSpy( 'widgetServices.release' )
    };
@@ -82,16 +81,13 @@ describe( 'An angular widget adapter module', () => {
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    it( 'fails to create an adapter with missing dependencies', () => {
-      var adapter = null;
-      expect( () => {
-         adapter = angularWidgetAdapterModule.create();
-      } ).toThrow();
+      expect( () => angularWidgetAdapterModule.create() ).toThrow();
    } );
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    it( 'allows to create an adapter from dependencies', () => {
-      var adapter = null;
+      let adapter = null;
       expect( () => {
          adapter = angularWidgetAdapterModule.create(
             assetResolver_, widgetSpec_, widgetFeatures_, widgetConfiguration_, anchor_
@@ -107,28 +103,25 @@ describe( 'An angular widget adapter module', () => {
 
 describe( 'An angular widget adapter', () => {
 
-   var environment_;
-   var adapter_;
-   var controllerScope_;
-   var injectedEventBus_;
-   var injectedContext_;
-   var mockThemeManager_;
-   var mockCssLoader_;
+   let environment_;
+   let adapter_;
+   let controllerScope_;
+   let injectedEventBus_;
+   let injectedContext_;
+   let mockThemeManager_;
+   let mockCssLoader_;
 
    // This mock will provide the non-themed HTML and the themed CSS.
    function mockThemeManager() {
-      var provideSpy = jasmine.createSpy( 'urlProvider.provide' ).and.callFake( paths => {
-         var results = {};
+      const provideSpy = jasmine.createSpy( 'urlProvider.provide' ).and.callFake( paths => {
+         const results = {};
          results[ 'test_widget.html' ] = htmlAssetPath_;
          results[ 'css/test_widget.css' ] = themeCssAssetPath_;
          return q.when( paths.map( _ => results[ _ ] ) );
       } );
 
-      var urlProviderSpy = jasmine.createSpy( 'themeManager.urlProvider' ).and.callFake( () => {
-         return {
-            provide: provideSpy
-         };
-      } );
+      const urlProviderSpy = jasmine.createSpy( 'themeManager.urlProvider' )
+         .and.callFake( () => ( { provide: provideSpy } ) );
 
       return {
          urlProvider: urlProviderSpy
@@ -142,8 +135,7 @@ describe( 'An angular widget adapter', () => {
    }
 
    beforeEach( () => {
-      // widgets.test.test_widget.Controller
-      var widgetModule = ng.module( 'testWidget', [] );
+      const widgetModule = ng.module( 'testWidget', [] );
       widgetModule.controller( 'TestWidgetController', [
          '$scope', 'axEventBus', 'axContext',
          ( $scope, axEventBus, axContext ) => {
@@ -153,7 +145,7 @@ describe( 'An angular widget adapter', () => {
          }
       ] );
 
-      var angularAdapterModule = angularWidgetAdapterModule.bootstrap( [ widgetModule ] );
+      const angularAdapterModule = angularWidgetAdapterModule.bootstrap( [ widgetModule ] );
 
       module( angularAdapterModule.name );
       module( $provide => {
@@ -206,7 +198,7 @@ describe( 'An angular widget adapter', () => {
 
    describe( 'asked to instantiate a widget controller', () => {
 
-      var onBeforeControllerCreationSpy;
+      let onBeforeControllerCreationSpy;
 
       beforeEach( () => {
          onBeforeControllerCreationSpy = jasmine.createSpy( 'onBeforeControllerCreationSpy' );
@@ -239,7 +231,7 @@ describe( 'An angular widget adapter', () => {
       it( 'calls onBeforeControllerCreation with environment and injections', () => {
          expect( onBeforeControllerCreationSpy ).toHaveBeenCalled();
 
-         var args = onBeforeControllerCreationSpy.calls.argsFor( 0 );
+         const args = onBeforeControllerCreationSpy.calls.argsFor( 0 );
          expect( args[ 0 ] ).toEqual( environment_ );
          expect( Object.keys( args[ 1 ] ) ).toContain( 'axContext' );
          expect( Object.keys( args[ 1 ] ) ).toContain( 'axEventBus' );
@@ -252,14 +244,14 @@ describe( 'An angular widget adapter', () => {
 
    describe( 'asked to attach its DOM representation', () => {
 
-      var mockAreaNode_;
+      let mockAreaNode_;
 
-      var resolveSpy = jasmine.createSpy( 'resolveSpy' ).and.callFake( () => {
+      const resolveSpy = jasmine.createSpy( 'resolveSpy' ).and.callFake( () => {
          adapter_.domAttachTo( {
             appendChild: node => {}
          } );
       } );
-      var rejectSpy = jasmine.createSpy( 'rejectSpy' );
+      const rejectSpy = jasmine.createSpy( 'rejectSpy' );
 
       beforeEach( () => {
          mockAreaNode_= document.createElement( 'DIV' );

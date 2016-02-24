@@ -14,6 +14,14 @@ System.config({
     "npm:*": "jspm_packages/npm/*"
   },
 
+  meta: {
+    "angular-mocks": {
+      "deps": [
+        "angular"
+      ]
+    }
+  },
+
   map: {
     "angular": "npm:angular@1.5.0",
     "angular-mocks": "npm:angular-mocks@1.5.0",

@@ -4,11 +4,12 @@
  * http://laxarjs.org/license
  */
 import ng from 'angular';
-import { assert, log } from 'laxar';
-import { name as idModuleName } from './directives/id';
-import { name as layoutModuleName } from './directives/layout';
-import { name as widgetAreaModuleName } from './directives/widget_area';
-import { name as profilingModuleName } from './profiling/profiling';
+import { assert, configuration, log } from 'laxar';
+import { name as idModuleName } from './lib/directives/id';
+import { name as layoutModuleName } from './lib/directives/layout';
+import { name as widgetAreaModuleName } from './lib/directives/widget_area';
+import { name as profilingModuleName } from './lib/profiling/profiling';
+import { name as axVisibilityServiceModuleName } from './lib/services/visibility_service';
 
 let $compile;
 let $controller;
@@ -32,14 +33,15 @@ export function bootstrap( widgetModules ) {
       return module.name;
    } );
 
-   // TODO: Here we probably need to boostrap an angular app
+   // TODO: Here we probably need to bootstrap an angular app
    // See issue https://github.com/LaxarJS/laxar-angular-adapter/issues/3
 
    const internalDependencies = [
       idModuleName,
       layoutModuleName,
       widgetAreaModuleName,
-      profilingModuleName
+      profilingModuleName,
+      axVisibilityServiceModuleName,
    ];
 
    return ng.module( 'axAngularWidgetAdapter', [ ...internalDependencies, ...externalDependencies ] )
