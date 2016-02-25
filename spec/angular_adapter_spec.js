@@ -9,6 +9,7 @@ import 'angular-mocks';
 import * as q from 'q';
 import { create as createEventBusMock } from 'laxar/lib/testing/event_bus_mock';
 import { create as createFrpMock } from 'laxar/lib/testing/file_resource_provider_mock';
+import { log } from 'laxar';
 import * as features from 'laxar/lib/loaders/features_provider';
 import paths from 'laxar/lib/loaders/paths';
 import widgetData from './widget_data';
@@ -95,6 +96,34 @@ describe( 'An angular widget adapter module', () => {
       } ).not.toThrow();
       expect( adapter ).not.toBe( null );
       expect( adapter.createController ).toBeDefined();
+   } );
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   describe( 'defines an $exceptionHandler provider', () => {
+
+      let $timeout;
+
+      beforeEach( () => {
+         module( angularWidgetAdapterModule.bootstrap( [] ).name );
+         inject( _$timeout_ => {
+            $timeout = _$timeout_;
+         } );
+         spyOn( log, 'error' );
+      } );
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      it( 'that overwrites the internal one with an implementation delegating to log.error', () => {
+         // simple way to trigger the $exceptionHandler
+         $timeout( () => {
+            throw new Error( 'my error' );
+         } );
+         $timeout.flush();
+
+         expect( log.error ).toHaveBeenCalled();
+      } );
+
    } );
 
 } );
@@ -245,13 +274,6 @@ describe( 'An angular widget adapter', () => {
    describe( 'asked to attach its DOM representation', () => {
 
       let mockAreaNode_;
-
-      const resolveSpy = jasmine.createSpy( 'resolveSpy' ).and.callFake( () => {
-         adapter_.domAttachTo( {
-            appendChild: node => {}
-         } );
-      } );
-      const rejectSpy = jasmine.createSpy( 'rejectSpy' );
 
       beforeEach( () => {
          mockAreaNode_= document.createElement( 'DIV' );

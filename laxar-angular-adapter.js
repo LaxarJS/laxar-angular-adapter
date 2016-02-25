@@ -4,7 +4,7 @@
  * http://laxarjs.org/license
  */
 import ng from 'angular';
-import { assert, configuration, log } from 'laxar';
+import { log } from 'laxar';
 import { name as idModuleName } from './lib/directives/id';
 import { name as layoutModuleName } from './lib/directives/layout';
 import { name as widgetAreaModuleName } from './lib/directives/widget_area';
@@ -45,11 +45,17 @@ export function bootstrap( widgetModules ) {
    ];
 
    return ng.module( 'axAngularWidgetAdapter', [ ...internalDependencies, ...externalDependencies ] )
-      .run( [ '$compile', '$controller', '$rootScope', function( _$compile_, _$controller_, _$rootScope_ ) {
+      .run( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
          $controller = _$controller_;
          $compile = _$compile_;
          $rootScope = _$rootScope_;
-      } ] );
+      } ] )
+      .factory( '$exceptionHandler', () => {
+         return ( exception, cause ) => {
+            const msg = exception.message || exception;
+            log.error( `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}` );
+         };
+      } );;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
