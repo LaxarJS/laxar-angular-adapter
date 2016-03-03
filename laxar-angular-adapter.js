@@ -4,6 +4,7 @@
  * http://laxarjs.org/license
  */
 import ng from 'angular';
+import ngSanitizeModule from 'angular-sanitize';
 import { log } from 'laxar';
 import { name as idModuleName } from './lib/directives/id';
 import { name as layoutModuleName } from './lib/directives/layout';
@@ -11,21 +12,27 @@ import { name as widgetAreaModuleName } from './lib/directives/widget_area';
 import { name as profilingModuleName } from './lib/profiling/profiling';
 import { name as axVisibilityServiceModuleName } from './lib/services/visibility_service';
 
+let laxarServices;
 let $compile;
 let $controller;
 let $rootScope;
 
-let controllerNames = {};
+const controllerNames = {};
+
+// exported for unit tests
+export const ANGULAR_MODULE_NAME = 'axAngularWidgetAdapter';
 
 export const technology = 'angular';
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function bootstrap( widgetModules ) {
+export function bootstrap( widgetModules, services ) {
+   laxarServices = services;
+
    const externalDependencies = ( widgetModules || [] ).map( module => {
       // for lookup, use a normalized module name that can also be derived from the widget.json name:
       const moduleKey = normalize( module.name );
-      controllerNames[ moduleKey ] = capitalize( module.name ) + 'Controller';
+      controllerNames[ moduleKey ] = `${capitalize( module.name )}Controller`;
 
       // add an additional lookup entry for deprecated "my.category.MyWidget" style module names:
       supportPreviousNaming( module.name );
@@ -33,10 +40,8 @@ export function bootstrap( widgetModules ) {
       return module.name;
    } );
 
-   // TODO: Here we probably need to bootstrap an angular app
-   // See issue https://github.com/LaxarJS/laxar-angular-adapter/issues/3
-
    const internalDependencies = [
+      ngSanitizeModule.name || 'ngSanitize',
       idModuleName,
       layoutModuleName,
       widgetAreaModuleName,
@@ -44,18 +49,25 @@ export function bootstrap( widgetModules ) {
       axVisibilityServiceModuleName,
    ];
 
-   return ng.module( 'axAngularWidgetAdapter', [ ...internalDependencies, ...externalDependencies ] )
+   ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] )
       .run( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
          $controller = _$controller_;
          $compile = _$compile_;
          $rootScope = _$rootScope_;
+
+         $rootScope.i18n = {
+            locale: 'default',
+            tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
+         };
       } ] )
       .factory( '$exceptionHandler', () => {
          return ( exception, cause ) => {
             const msg = exception.message || exception;
             log.error( `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}` );
          };
-      } );;
+      } );
+
+   ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,11 +85,10 @@ export function bootstrap( widgetModules ) {
  * @param {String}      environment.context.widget.id
  * @param {String}      environment.context.widget.path
  * @param {Object}      environment.specification
- * @param {Object}      services
  *
  * @return {Object}
  */
-export function create( environment, services ) {
+export function create( environment ) {
 
    // services are not relevant for now, since all LaxarJS services are already available via AngularJS DI.
 
@@ -88,9 +99,7 @@ export function create( environment, services ) {
       destroy: destroy
    };
 
-   const context = environment.context;
-   let scope_;
-   let injections_;
+   let injections;
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -98,24 +107,18 @@ export function create( environment, services ) {
       const moduleKey = normalize( environment.specification.name );
       const controllerName = controllerNames[ moduleKey ];
 
-      injections_ = {
-         axContext: context,
-         axEventBus: context.eventBus,
-         axFeatures: context.features || {}
+      injections = {
+         axConfiguration: laxarServices.configuration,
+         axContext: environment.context,
+         axEventBus: environment.context.eventBus,
+         axFeatures: environment.context.features || {},
+         axFlowService: laxarServices.flowService,
+         axGlobalEventBus: laxarServices.globalEventBus,
+         $scope: ng.extend( $rootScope.$new(), environment.context )
       };
-      Object.defineProperty( injections_, '$scope', {
-         enumerable: true,
-         get() {
-            if( !scope_ ) {
-               scope_ = $rootScope.$new();
-               ng.extend( scope_, context );
-            }
-            return scope_;
-         }
-      } );
 
-      config.onBeforeControllerCreation( environment, injections_ );
-      $controller( controllerName, injections_ );
+      config.onBeforeControllerCreation( environment, injections );
+      $controller( controllerName, injections );
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,8 +139,8 @@ export function create( environment, services ) {
       const element = ng.element( environment.anchorElement );
       element.html( templateHtml );
       areaElement.appendChild( environment.anchorElement );
-      $compile( environment.anchorElement )( injections_.$scope );
-      templateHtml = null;
+      $compile( environment.anchorElement )( injections.$scope );
+      injections.$scope.$digest();
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,9 +155,7 @@ export function create( environment, services ) {
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    function destroy() {
-      if( scope_ ) {
-         scope_.$destroy();
-      }
+      injections.$scope.$destroy();
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
