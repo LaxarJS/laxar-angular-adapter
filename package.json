@@ -1,15 +1,21 @@
 {
   "name": "laxar-angular-adapter",
-  "version": "0.2.0",
+  "version": "0.3.0-pre",
   "description": "Write LaxarJS widgets and controls with AngularJS",
   "main": "laxar-angular-adapter.js",
   "scripts": {
-    "test": "grunt test --continue",
-    "prepublish": "fixinstall && jspm install"
+    "test": "grunt karma && npm run eslint",
+    "karma": "karma start karma.config.js",
+    "eslint": "eslint laxar-angular-adapter.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LaxarJS/laxar-angular-adapter.git"
+  },
+  "dependencies": {
+    "angular": "^1.5.7",
+    "angular-sanitize": "^1.5.7",
+    "laxar": "^2.0.0-alpha.2"
   },
   "keywords": [
     "LaxarJS",
@@ -24,37 +30,23 @@
   },
   "homepage": "https://github.com/LaxarJS/laxar-angular-adapter#readme",
   "devDependencies": {
-    "grunt": "~0.4.4",
-    "grunt-cli": "~0.1.13",
-    "grunt-karma": "^0.12.1",
-    "grunt-laxar": "~1.0.0",
-    "gruntify-eslint": "^2.0.0",
+    "angular-mocks": "^1.5.7",
+    "babel-core": "^6.10.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "eslint": "^2.13.1",
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-karma": "^2.0.0",
     "jasmine-core": "^2.4.1",
-    "jspm": "^0.16.27",
-    "karma": "^0.13.19",
-    "karma-chrome-launcher": "^0.2.2",
-    "karma-firefox-launcher": "^0.1.7",
-    "karma-jasmine": "^0.3.6",
-    "karma-jspm": "^2.0.2",
-    "karma-junit-reporter": "^0.3.8",
-    "karma-phantomjs-launcher": "^0.2.3",
-    "phantomjs": "^2.1.3",
-    "systemjs": "^0.19.17",
-    "systemjs-builder": "^0.15.3"
-  },
-  "jspm": {
-    "configFile": "system.config.js",
-    "dependencies": {
-      "angular": "npm:angular",
-      "angular-sanitize": "npm:angular-sanitize@^1.5.0",
-      "laxar": "github:LaxarJS/laxar@2.0.0-alpha.0"
-    },
-    "devDependencies": {
-      "angular-mocks": "npm:angular-mocks@^1.5.0",
-      "babel": "npm:babel-core@^5.8.24",
-      "babel-runtime": "npm:babel-runtime@^5.8.24",
-      "core-js": "npm:core-js@^1.1.4",
-      "laxar-jasmine-runner": "github:LaxarJS/laxar-jasmine-runner@^0.1.1"
-    }
+    "karma": "^1.1.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-phantomjs-launcher": "^1.0.1",
+    "karma-sourcemap-loader": "^0.3.7",
+    "karma-webpack": "^1.7.0",
+    "script-loader": "^0.7.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
   }
 }

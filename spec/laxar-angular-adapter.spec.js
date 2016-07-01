@@ -3,19 +3,16 @@
  * Released under the MIT license.
  * http://laxarjs.org/license
  */
-import * as angularWidgetAdapterModule from '../laxar-angular-adapter';
+import { technology, bootstrap, reset, ANGULAR_MODULE_NAME } from '../laxar-angular-adapter';
 import ng from 'angular';
 import 'angular-mocks';
 import { create as createEventBusMock } from 'laxar/lib/testing/event_bus_mock';
-import { log } from 'laxar';
+import { create as createConfigurationMock } from 'laxar/lib/testing/configuration_mock';
+import { create as createLogMock } from 'laxar/lib/testing/log_mock';
 import * as features from 'laxar/lib/loaders/features_provider';
-import paths from 'laxar/lib/loaders/paths';
 import widgetData from './widget_data';
 
 const { module, inject } = window;
-
-paths.WIDGETS = 'the_widgets';
-paths.THEMES = 'the_themes';
 
 const defaultCssAssetPath_ = 'the_themes/default.theme/test/test_widget/css/test_widget.css';
 const themeCssAssetPath_ = 'the_themes/blue.theme/test/test_widget/css/test_widget.css';
@@ -56,34 +53,34 @@ beforeEach( () => {
    };
 } );
 
+afterEach( reset );
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 describe( 'An angular widget adapter module', () => {
 
-   it( 'provides an AngularJS module representation', () => {
-      expect( angularWidgetAdapterModule.bootstrap ).toBeDefined();
-      expect( angularWidgetAdapterModule.bootstrap ).toEqual( jasmine.any( Function ) );
-      expect( angularWidgetAdapterModule.technology ).toBeDefined();
-      expect( angularWidgetAdapterModule.technology ).toEqual( 'angular' );
-      expect( angularWidgetAdapterModule.create ).toBeDefined();
-      expect( angularWidgetAdapterModule.create ).toEqual( jasmine.any( Function ) );
+   it( 'provides a laxarjs compatible adapter module', () => {
+      expect( bootstrap ).toEqual( jasmine.any( Function ) );
+      expect( technology ).toEqual( 'angular' );
    } );
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    describe( 'defines an $exceptionHandler provider', () => {
 
+      let logMock;
       let $timeout;
 
       beforeEach( () => {
-         angularWidgetAdapterModule.bootstrap( [], {
-            configuration: { get: () => {} }
+         logMock = createLogMock();
+         bootstrap( [], {
+            configuration: createConfigurationMock(),
+            log: logMock
          } );
-         module( angularWidgetAdapterModule.ANGULAR_MODULE_NAME );
+         module( ANGULAR_MODULE_NAME );
          inject( _$timeout_ => {
             $timeout = _$timeout_;
          } );
-         spyOn( log, 'error' );
       } );
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,8 +91,7 @@ describe( 'An angular widget adapter module', () => {
             throw new Error( 'my error' );
          } );
          $timeout.flush();
-
-         expect( log.error ).toHaveBeenCalled();
+         expect( logMock.error ).toHaveBeenCalled();
       } );
 
    } );
@@ -107,6 +103,7 @@ describe( 'An angular widget adapter module', () => {
 describe( 'An angular widget adapter', () => {
 
    let environment_;
+   let adapterFactory_;
    let adapter_;
    let controllerScope_;
    let injectedEventBus_;
@@ -114,20 +111,19 @@ describe( 'An angular widget adapter', () => {
 
    beforeEach( () => {
       const widgetModule = ng.module( 'testWidget', [] );
-      widgetModule.controller( 'TestWidgetController', [
-         '$scope', 'axEventBus', 'axContext',
-         ( $scope, axEventBus, axContext ) => {
+      widgetModule.controller( 'TestWidgetController', ( $scope, axEventBus, axContext ) => {
             controllerScope_ = $scope;
             injectedEventBus_ = axEventBus;
             injectedContext_ = axContext;
          }
-      ] );
+      );
 
-      angularWidgetAdapterModule.bootstrap( [ widgetModule ], {
-         configuration: { get: () => {} }
+      adapterFactory_ = bootstrap( [ widgetModule ], {
+         configuration: createConfigurationMock(),
+         log: createLogMock()
       } );
 
-      module( angularWidgetAdapterModule.ANGULAR_MODULE_NAME );
+      module( ANGULAR_MODULE_NAME );
       module( $provide => {
          $provide.value( '$rootScope', {
             $apply: jasmine.createSpy( '$rootScope.$apply' ),
@@ -136,7 +132,7 @@ describe( 'An angular widget adapter', () => {
       } );
 
       // fake start of the application
-      angularBootstrap( {}, [ angularWidgetAdapterModule.ANGULAR_MODULE_NAME ] );
+      angularBootstrap( {}, [ ANGULAR_MODULE_NAME ] );
 
       environment_ = {
          anchorElement: anchor_,
@@ -153,14 +149,15 @@ describe( 'An angular widget adapter', () => {
          specification: widgetSpec_
       };
 
-      adapter_ = angularWidgetAdapterModule.create( environment_ );
+      adapter_ = adapterFactory_.create( environment_ );
    } );
+
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    it( 'for applyViewChanges() calls $apply on the $rootScope', () => {
       inject( $rootScope => {
-         angularWidgetAdapterModule.applyViewChanges();
+         adapterFactory_.applyViewChanges();
 
          expect( $rootScope.$apply ).toHaveBeenCalled();
       } );

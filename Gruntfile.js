@@ -3,72 +3,50 @@
  * Released under the MIT license.
  * http://laxarjs.org/license
  */
-/*jshint node: true*/
+/* eslint-env node */
+/* eslint no-var:0 */
 module.exports = function (grunt) {
    'use strict';
 
    var pkg = grunt.file.readJSON( 'package.json' );
+   var polyfillPath = './node_modules/laxar/dist/polyfills.js';
+   var preprocessors = {};
+   preprocessors[ polyfillPath ] = [ 'webpack', 'sourcemap' ];
+   preprocessors[ '**/spec/spec-runner.js' ] = [ 'webpack', 'sourcemap' ];
+   preprocessors[ '**/laxar.js' ] = [ 'webpack', 'sourcemap' ];
 
    grunt.initConfig( {
       pkg: pkg,
       pkgFile: 'package.json',
       karma: {
          options: {
-            basePath: '',
-            browsers: [ 'PhantomJS' ],
-            browserNoActivityTimeout: 100000,
-            plugins: [
-               'karma-jspm',
-               'karma-jasmine',
-               'karma-junit-reporter',
-               'karma-phantomjs-launcher',
-               'karma-chrome-launcher'
-            ],
-            reporters: [ 'progress', 'junit' ],
-            junitReporter: {
-               outputDir: 'karma-output/'
-            },
-            frameworks: [ 'jspm', 'jasmine' ],
-            proxies: {
-               '/jspm_packages/': '/base/jspm_packages/',
-               '/laxar-angular-adapter.js': '/base/laxar-angular-adapter.js',
-               '/lib/': '/base/lib/',
-               '/spec/': '/base/spec/',
-            },
-            jspm: {
-               config: 'system.config.js',
-               loadFiles: [
-                  'lib/**/*_spec.js',
-                  'spec/*_spec.js',
-               ],
-               serveFiles: [
-                  'jspm_packages/**/*.js',
-                  'laxar-angular-adapter.js',
-                  'lib/**/!(*_spec).js',
-                  'spec/!(*_spec).js',
-               ]
+            configFile: 'karma.config.js',
+            preprocessors: preprocessors
+         },
+         adapter: {
+            options: {
+               files: [ polyfillPath, 'spec/spec-runner.js' ]
             }
          },
-         unit: {
-            singleRun: true,
-         }
-      },
-      eslint: {
-         options: {
-            config: '.eslintrc.json'
+         directives: {
+            options: {
+               files: [ polyfillPath, 'lib/directives/spec/spec-runner.js' ]
+            }
          },
-         src: [
-            'laxar-angular-adapter.js',
-            'lib/**/*.js',
-            'spec/*.js'
-         ]
+         profiling: {
+            options: {
+               files: [ polyfillPath, 'lib/profiling/spec/spec-runner.js' ]
+            }
+         },
+         services: {
+            options: {
+               files: [ polyfillPath, 'lib/services/spec/spec-runner.js' ]
+            }
+         }
       }
    } );
 
    grunt.loadNpmTasks( 'grunt-karma' );
-   grunt.loadNpmTasks( 'gruntify-eslint' );
-
-   grunt.registerTask( 'test', [ 'eslint', 'karma' ] );
-
-   grunt.registerTask( 'default', [ 'test' ] );
+   grunt.registerTask( 'default', [ 'karma' ] );
+   grunt.registerTask( 'test', [ 'karma' ] );
 };
