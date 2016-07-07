@@ -15,7 +15,8 @@
   "dependencies": {
     "angular": "^1.5.7",
     "angular-sanitize": "^1.5.7",
-    "laxar": "^2.0.0-alpha.2"
+    "laxar": "^2.0.0-alpha.2",
+    "page": "^1.7.1"
   },
   "keywords": [
     "LaxarJS",
