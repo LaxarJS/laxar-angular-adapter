@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+- [#6](https://github.com/LaxarJS/laxar-angular-adapter/issues/6): LaxarJS v2 Compatibility
+    + **BREAKING CHANGE:** see ticket for details
+
 
 ## v0.2.0
 

@@ -4,7 +4,6 @@
 
 const webpackConfig = Object.assign( {}, require('./webpack.base.config' ) );
 webpackConfig.devtool = 'inline-source-map';
-webpackConfig.node = { fs: 'empty' };
 
 module.exports = function(config) {
    config.set({

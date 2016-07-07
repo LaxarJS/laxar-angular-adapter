@@ -1,4 +1,4 @@
-# LaxarJS adapter for AngularJS 1
+# laxar-angular-adapter [![Build Status](https://travis-ci.org/LaxarJS/laxar-angular-adapter.svg?branch=master)](https://travis-ci.org/LaxarJS/laxar-angular-adapter)
 
 > Write LaxarJS widgets and controls with AngularJS
 
