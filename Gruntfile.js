@@ -9,7 +9,7 @@ module.exports = function (grunt) {
    'use strict';
 
    var pkg = grunt.file.readJSON( 'package.json' );
-   var polyfillPath = './node_modules/laxar/dist/polyfills.js';
+   var polyfillPath = require.resolve( 'laxar/dist/polyfills' );
    var preprocessors = {};
    preprocessors[ polyfillPath ] = [ 'webpack', 'sourcemap' ];
    preprocessors[ '**/spec/spec-runner.js' ] = [ 'webpack', 'sourcemap' ];

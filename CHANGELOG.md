@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#10](https://github.com/LaxarJS/laxar-angular-adapter/issues/10): Upgraded build/test dependencies (grunt v1)
 - [#6](https://github.com/LaxarJS/laxar-angular-adapter/issues/6): LaxarJS v2 Compatibility
     + **BREAKING CHANGE:** see ticket for details
 
