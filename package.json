@@ -4,9 +4,11 @@
   "description": "Write LaxarJS widgets and controls with AngularJS",
   "main": "laxar-angular-adapter.js",
   "scripts": {
+    "prepublish": "webpack",
     "test": "grunt karma && npm run eslint",
     "karma": "karma start karma.config.js",
-    "eslint": "eslint laxar-angular-adapter.js"
+    "eslint": "eslint laxar-angular-adapter.js",
+    "browser-spec": "webpack --config webpack.browser-spec.config.js && webpack-dev-server --port 8085 --inline --config webpack.browser-spec.config.js"
   },
   "repository": {
     "type": "git",
@@ -42,11 +44,15 @@
     "grunt-karma": "^2.0.0",
     "jasmine-core": "^2.4.1",
     "karma": "^1.1.0",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "^1.0.2",
+    "karma-junit-reporter": "^1.1.0",
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
     "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-server": "^1.14.1",
+    "webpack-jasmine-html-runner-plugin": "~0.1.0"
   }
 }

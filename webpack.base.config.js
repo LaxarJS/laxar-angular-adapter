@@ -1,17 +1,13 @@
+/**
+ * Copyright 2016 aixigo AG
+ * Released under the MIT license.
+ * http://laxarjs.org/license
+ */
 /* eslint-env node */
 
-const path = require( 'path' );
-
 module.exports = {
-   entry: {
-   },
-   resolve: {
-      root: [
-         path.resolve( './node_modules' )
-      ],
-      alias: {
-         'page': path.resolve( './node_modules/page/page' )
-      }
+   entry:  {
+      'laxar-angular-adapter': './laxar-angular-adapter.js'
    },
    module: {
       noParse: /node_modules\/page\/page\.js/,

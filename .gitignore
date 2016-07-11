@@ -2,6 +2,8 @@
 /.grunt
 /jspm_packages
 /node_modules
+/karma-output
+/spec-output
 /bower_components
 /dist
 /karma-output

@@ -83,6 +83,8 @@ export function bootstrap( widgetModules, laxarServices ) {
     */
    function create( environment ) {
 
+      let injections;
+
       return {
          createController: createController,
          domAttachTo: domAttachTo,
@@ -90,7 +92,6 @@ export function bootstrap( widgetModules, laxarServices ) {
          destroy: destroy
       };
 
-      let injections;
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 

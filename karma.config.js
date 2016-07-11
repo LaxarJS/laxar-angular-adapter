@@ -1,44 +1,45 @@
-// Karma configuration for the laxar-angular-adapter
+/**
+ * Copyright 2015 aixigo AG
+ * Released under the MIT license.
+ * http://laxarjs.org/license
+ */
 /* eslint-env node */
 
-
 const webpackConfig = Object.assign( {}, require('./webpack.base.config' ) );
+delete webpackConfig.entry;
 webpackConfig.devtool = 'inline-source-map';
 
 module.exports = function(config) {
-   config.set({
+   const browsers = [ 'PhantomJS', 'Firefox' ].concat( [
+      process.env.TRAVIS ? 'ChromeTravisCi' : 'Chrome'
+   ] );
 
-      // frameworks to use
-      // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+   config.set( {
       frameworks: [ 'jasmine' ],
+      files: [
+         require.resolve( 'laxar/dist/polyfills' ),
+         '**/spec/spec-runner.js'
+      ],
+      preprocessors: {
+         '**/spec/spec-runner.js': [ 'webpack', 'sourcemap' ]
+      },
       webpack: webpackConfig,
 
-      // test results reporter to use
-      // possible values: 'dots', 'progress'
-      // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-      reporters: [ 'progress' ],
-      unit: {
-         singleRun: true,
-      },
+      reporters: [ 'progress', 'junit' ],
       junitReporter: {
          outputDir: 'karma-output/'
       },
-      logLevel: config.LOG_INFO,
-      client: {
-         captureConsole: true
-      },
-
-      // web server port
       port: 9876,
-
-      // enable / disable colors in the output (reporters and logs)
-      colors: true,
-
-      // start these browsers
-      // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-      browsers: [ 'PhantomJS' ],
-
+      browsers: browsers,
+      customLaunchers: {
+         ChromeTravisCi: {
+            base: 'Chrome',
+            flags: [ '--no-sandbox' ]
+         }
+      },
       browserNoActivityTimeout: 100000,
       singleRun: true,
-   });
+      autoWatch: false,
+      concurrency: Infinity
+   } );
 };
