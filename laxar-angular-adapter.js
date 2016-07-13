@@ -25,14 +25,28 @@ let injectorCreated = false;
 
 /**
  * Provides an AngularJS v1.x adapter factory for a laxarjs bootstrapping context.
+ * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
  *
  * Because in AngularJS v1.x module registry and injector are global, there are certain restrictions when
  * bootstrapping multiple LaxarJS applications in the same Browser window:
  *  - Currently, all AngularJS modules must be available when bootstrapping the first instance, and the
  *    widget modules for all bootstrapping instances must be passed to the first invocation.
  *  - Multiple bootstrapping instances share each other's AngularJS modules (e.g. controls).
+ *
+ * @param {Array} modules
+ *   The widget and control modules matching this adapter's technology.
+ *
+ * @param {Object} laxarServices
+ *   adapter-visible laxarjs services
+ *
+ * @return {{
+ *   technology: String,
+ *   create: Function,
+ *   applyViewChanges: Function
+ * }}
+ *   The instantiated adapter factory.
  */
-export function bootstrap( widgetModules, laxarServices ) {
+export function bootstrap( modules, laxarServices ) {
 
    const api = {
       create,
@@ -42,7 +56,7 @@ export function bootstrap( widgetModules, laxarServices ) {
 
    // register controllers under normalized module names that can also be derived from the widget.json name:
    const controllerNames = {};
-   widgetModules.forEach( module => {
+   modules.forEach( module => {
       const moduleKey = normalize( module.name );
       controllerNames[ moduleKey ] = `${capitalize( module.name )}Controller`;
    } );
@@ -55,7 +69,7 @@ export function bootstrap( widgetModules, laxarServices ) {
    if( !injectorCreated ) {
       injectorCreated = true;
       createAngularServicesModule( laxarServices );
-      createAngularAdapterModule( laxarServices, widgetModules || [] );
+      createAngularAdapterModule( laxarServices, modules || [] );
       ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
    }
 
@@ -64,8 +78,10 @@ export function bootstrap( widgetModules, laxarServices ) {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+   // eslint-disable-next-line valid-jsdoc
    /**
     * Creates an AngularJS adapter for a specific widget instace.
+    * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
     *
     * @param {Object}      environment
     * @param {HTMLElement} environment.anchorElement
@@ -86,12 +102,11 @@ export function bootstrap( widgetModules, laxarServices ) {
       let injections;
 
       return {
-         createController: createController,
-         domAttachTo: domAttachTo,
-         domDetach: domDetach,
-         destroy: destroy
+         createController,
+         domAttachTo,
+         domDetach,
+         destroy
       };
-
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -127,7 +142,7 @@ export function bootstrap( widgetModules, laxarServices ) {
        * @param {HTMLElement} areaElement
        *    The widget area to attach this widget to.
        * @param {String} templateHtml
-       *
+       *    The AngularJS HTML template to compile and link to this widget
        */
       function domAttachTo( areaElement, templateHtml ) {
          if( templateHtml === null ) {
@@ -164,7 +179,7 @@ export function bootstrap( widgetModules, laxarServices ) {
       $rootScope.$apply();
    }
 
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    function createAngularServicesModule( laxarServices ) {
       ng.module( ANGULAR_SERVICES_MODULE_NAME, [] )
@@ -175,7 +190,7 @@ export function bootstrap( widgetModules, laxarServices ) {
          .factory( 'axLayoutLoader', () => laxarServices.layoutLoader );
    }
 
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    function createAngularAdapterModule() {
 
@@ -186,10 +201,10 @@ export function bootstrap( widgetModules, laxarServices ) {
          layoutModuleName,
          widgetAreaModuleName,
          profilingModuleName,
-         axVisibilityServiceModuleName,
+         axVisibilityServiceModuleName
       ];
 
-      const externalDependencies = ( widgetModules || [] ).map( _ => _.name );
+      const externalDependencies = ( modules || [] ).map( _ => _.name );
 
       ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] )
          .run( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
@@ -200,7 +215,9 @@ export function bootstrap( widgetModules, laxarServices ) {
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
                const msg = exception.message || exception;
-               log.error( `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}` );
+               log.error(
+                  `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}`
+               );
             };
          } );
 

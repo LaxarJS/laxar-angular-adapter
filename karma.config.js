@@ -18,10 +18,12 @@ module.exports = function(config) {
       frameworks: [ 'jasmine' ],
       files: [
          require.resolve( 'laxar/dist/polyfills' ),
-         '**/spec/spec-runner.js'
+         'lib/**/spec/spec-runner.js',
+         'spec/spec-runner.js'
       ],
       preprocessors: {
-         '**/spec/spec-runner.js': [ 'webpack', 'sourcemap' ]
+         'lib/**/spec/spec-runner.js': [ 'webpack', 'sourcemap' ],
+         'spec/spec-runner.js': [ 'webpack', 'sourcemap' ]
       },
       webpack: webpackConfig,
 
@@ -30,7 +32,7 @@ module.exports = function(config) {
          outputDir: 'karma-output/'
       },
       port: 9876,
-      browsers: browsers,
+      browsers,
       customLaunchers: {
          ChromeTravisCi: {
             base: 'Chrome',

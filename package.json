@@ -6,8 +6,8 @@
   "scripts": {
     "prepublish": "webpack",
     "test": "grunt karma && npm run eslint",
-    "karma": "karma start karma.config.js",
-    "eslint": "eslint laxar-angular-adapter.js",
+    "karma": "grunt karma",
+    "eslint": "eslint laxar-angular-adapter.js lib spec",
     "browser-spec": "webpack --config webpack.browser-spec.config.js && webpack-dev-server --port 8085 --inline --config webpack.browser-spec.config.js"
   },
   "repository": {

@@ -6,7 +6,7 @@
 /* eslint-env node */
 
 module.exports = {
-   entry:  {
+   entry: {
       'laxar-angular-adapter': './laxar-angular-adapter.js'
    },
    module: {
