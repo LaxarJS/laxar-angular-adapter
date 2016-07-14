@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#13](https://github.com/LaxarJS/laxar-react-adapter/issues/13): eslint: use shared configuration
 - [#12](https://github.com/LaxarJS/laxar-react-adapter/issues/12): additional eslint restrictions
 - [#11](https://github.com/LaxarJS/laxar-react-adapter/issues/11): added dist-target for UMD-library
 - [#10](https://github.com/LaxarJS/laxar-angular-adapter/issues/10): Upgraded build/test dependencies (grunt v1)
