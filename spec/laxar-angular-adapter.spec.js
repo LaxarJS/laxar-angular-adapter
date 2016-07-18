@@ -133,17 +133,23 @@ describe( 'An angular widget adapter', () => {
       // fake start of the application
       angularBootstrap( {}, [ ANGULAR_MODULE_NAME ] );
 
+      const context = {
+         eventBus: widgetServices.eventBus,
+         features: widgetFeatures,
+         id: widgetServices.idGenerator,
+         widget: {
+            area: widgetConfiguration.area,
+            id: widgetConfiguration.id,
+            path: widgetConfiguration.widget
+         }
+      };
+
       environment = {
          anchorElement: anchor,
-         context: {
-            eventBus: widgetServices.eventBus,
-            features: widgetFeatures,
-            id: widgetServices.idGenerator,
-            widget: {
-               area: widgetConfiguration.area,
-               id: widgetConfiguration.id,
-               path: widgetConfiguration.widget
-            }
+         context,
+         services: {
+            axContext: context,
+            axEventBus: widgetServices.eventBus
          },
          specification: widgetSpec
       };
