@@ -67,12 +67,11 @@ export function bootstrap( modules, laxarServices ) {
    // Instantiate the AngularJS modules and bootstrap angular, but only the first time!
    if( !injectorCreated ) {
       injectorCreated = true;
-      createAngularServicesModule( laxarServices );
-      createAngularAdapterModule( laxarServices, modules || [] );
+      createAngularServicesModule();
+      createAngularAdapterModule();
       ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
    }
 
-   const { log } = laxarServices;
    return api;
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,13 +91,14 @@ export function bootstrap( modules, laxarServices ) {
     * @param {String}      environment.context.widget.area
     * @param {String}      environment.context.widget.id
     * @param {String}      environment.context.widget.path
+    * @param {Object}      environment.services
     * @param {Object}      environment.specification
     *
     * @return {Object}
     */
    function create( environment ) {
 
-      let injections;
+      let widgetScope;
 
       return {
          createController,
@@ -117,20 +117,17 @@ export function bootstrap( modules, laxarServices ) {
                tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
             };
          }
+         widgetScope = ng.extend( bootstrappingScope.$new(), environment.context );
 
          const moduleKey = normalize( environment.specification.name );
          const controllerName = controllerNames[ moduleKey ];
+         const availableInjections = Object.freeze( {
+            ...environment.services,
+            $scope: widgetScope
+         } );
 
-         injections = {
-            axContext: environment.context,
-            axEventBus: environment.context.eventBus,
-            axFeatures: environment.context.features || {},
-            axFlowService: laxarServices.flowService,
-            $scope: ng.extend( bootstrappingScope.$new(), environment.context )
-         };
-
-         config.onBeforeControllerCreation( environment, injections );
-         $controller( controllerName, injections );
+         config.onBeforeControllerCreation( environment, availableInjections );
+         $controller( controllerName, availableInjections );
       }
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,8 +148,8 @@ export function bootstrap( modules, laxarServices ) {
          const element = ng.element( environment.anchorElement );
          element.html( templateHtml );
          areaElement.appendChild( environment.anchorElement );
-         $compile( environment.anchorElement )( injections.$scope );
-         injections.$scope.$digest();
+         $compile( environment.anchorElement )( widgetScope );
+         widgetScope.$digest();
       }
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +164,7 @@ export function bootstrap( modules, laxarServices ) {
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       function destroy() {
-         injections.$scope.$destroy();
+         widgetScope.$destroy();
       }
 
    }
@@ -180,12 +177,16 @@ export function bootstrap( modules, laxarServices ) {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   function createAngularServicesModule( laxarServices ) {
+   function createAngularServicesModule() {
+      // Here we ensure availability of globally public laxar services for directives and other services
       ng.module( ANGULAR_SERVICES_MODULE_NAME, [] )
          .factory( 'axConfiguration', () => laxarServices.configuration )
          .factory( 'axGlobalEventBus', () => laxarServices.globalEventBus )
          .factory( 'axGlobalLog', () => laxarServices.log )
-         .factory( 'axHeartbeat', () => laxarServices.heartbeat );
+         .factory( 'axGlobalStorage', () => laxarServices.storage )
+         .factory( 'axHeartbeat', () => laxarServices.heartbeat )
+         .factory( 'axI18n', () => laxarServices.i18n )
+         .factory( 'axTooling', () => laxarServices.toolingProviders );
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +213,7 @@ export function bootstrap( modules, laxarServices ) {
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
                const msg = exception.message || exception;
-               log.error(
+               laxarServices.log.error(
                   `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}`
                );
             };

@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#5](https://github.com/LaxarJS/laxar-angular-adapter/issues/5): services: added AngularJS injections for widget services
 - [#14](https://github.com/LaxarJS/laxar-angular-adapter/issues/14): directives: removed layout directive
     + **BREAKING CHANGE:** see ticket for details
 - [#13](https://github.com/LaxarJS/laxar-react-adapter/issues/13): eslint: use shared configuration
