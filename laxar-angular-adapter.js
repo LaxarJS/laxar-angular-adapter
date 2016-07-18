@@ -6,7 +6,6 @@
 import ng from 'angular';
 import ngSanitizeModule from 'angular-sanitize';
 import { name as idModuleName } from './lib/directives/id';
-import { name as layoutModuleName } from './lib/directives/layout';
 import { name as widgetAreaModuleName } from './lib/directives/widget_area';
 import { name as profilingModuleName } from './lib/profiling/profiling';
 import { name as axVisibilityServiceModuleName } from './lib/services/visibility_service';
@@ -80,7 +79,7 @@ export function bootstrap( modules, laxarServices ) {
 
    // eslint-disable-next-line valid-jsdoc
    /**
-    * Creates an AngularJS adapter for a specific widget instace.
+    * Creates an AngularJS adapter for a specific widget instance.
     * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
     *
     * @param {Object}      environment
@@ -186,8 +185,7 @@ export function bootstrap( modules, laxarServices ) {
          .factory( 'axConfiguration', () => laxarServices.configuration )
          .factory( 'axGlobalEventBus', () => laxarServices.globalEventBus )
          .factory( 'axGlobalLog', () => laxarServices.log )
-         .factory( 'axHeartbeat', () => laxarServices.heartbeat )
-         .factory( 'axLayoutLoader', () => laxarServices.layoutLoader );
+         .factory( 'axHeartbeat', () => laxarServices.heartbeat );
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +196,6 @@ export function bootstrap( modules, laxarServices ) {
          ngSanitizeModule.name || 'ngSanitize',
          ANGULAR_SERVICES_MODULE_NAME,
          idModuleName,
-         layoutModuleName,
          widgetAreaModuleName,
          profilingModuleName,
          axVisibilityServiceModuleName
