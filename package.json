@@ -20,7 +20,7 @@
   "peerDependencies": {
      "angular": "^1.5.7",
      "angular-sanitize": "^1.5.7",
-     "laxar": "^2.0.0-alpha.2"
+     "laxar": "^2.0.0-alpha.4"
   },
   "keywords": [
     "LaxarJS",
@@ -57,7 +57,7 @@
     "karma-phantomjs-launcher": "^1.0.1",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
-    "laxar": "^2.0.0-alpha.2",
+    "laxar": "^2.0.0-alpha.4",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1",
     "webpack-jasmine-html-runner-plugin": "~0.1.0"

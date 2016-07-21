@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#18](https://github.com/LaxarJS/laxar-angular-adapter/issues/18): services: share the same object for $scope and axContext injections
 - [#16](https://github.com/LaxarJS/laxar-angular-adapter/issues/16): services: provided access to widget specific services
 - [#17](https://github.com/LaxarJS/laxar-angular-adapter/issues/17): project: turned framework dependencies into peer-dependencies
 - [#5](https://github.com/LaxarJS/laxar-angular-adapter/issues/5): services: added AngularJS injections for widget services

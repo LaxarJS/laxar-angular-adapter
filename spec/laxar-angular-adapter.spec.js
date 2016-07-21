@@ -146,7 +146,6 @@ describe( 'An angular widget adapter', () => {
 
       environment = {
          anchorElement: anchor,
-         context,
          services: {
             axContext: context,
             axEventBus: widgetServices.eventBus
@@ -154,9 +153,12 @@ describe( 'An angular widget adapter', () => {
          specification: widgetSpec
       };
 
+      const decorators = adapterFactory.serviceDecorators( widgetSpec, widgetConfiguration );
+      Object.keys( decorators ).forEach( name => {
+         environment.services[ name ] = decorators[ name ]( environment.services[ name ] );
+      } );
       adapter = adapterFactory.create( environment );
    } );
-
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -190,14 +192,20 @@ describe( 'An angular widget adapter', () => {
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      it( 'injects the event bus instance for the widget as service (#107)', () => {
+      it( 'injects the event bus instance for the widget as service (laxar#107)', () => {
          expect( injectedEventBus ).toEqual( controllerScope.eventBus );
       } );
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      it( 'injects a context for the widget as service (#167)', () => {
-         expect( injectedContext ).toEqual( environment.context );
+      it( 'uses the same injection for $scope and axContext (#18)', () => {
+         expect( controllerScope ).toBe( injectedContext );
+      } );
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      it( 'injects a context for the widget as service (laxar#167)', () => {
+         expect( injectedContext ).toEqual( environment.services.axContext );
       } );
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////

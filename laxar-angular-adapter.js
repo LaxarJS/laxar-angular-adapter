@@ -50,6 +50,7 @@ export function bootstrap( modules, laxarServices ) {
 
    const api = {
       create,
+      serviceDecorators,
       technology,
       applyViewChanges
    };
@@ -79,6 +80,23 @@ export function bootstrap( modules, laxarServices ) {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+   function serviceDecorators() {
+      return {
+         axContext( context ) {
+            if( !bootstrappingScope ) {
+               bootstrappingScope = $rootScope.$new();
+               bootstrappingScope.i18n = {
+                  locale: 'default',
+                  tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
+               };
+            }
+            return ng.extend( bootstrappingScope.$new(), context );
+         }
+      };
+   }
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
    // eslint-disable-next-line valid-jsdoc
    /**
     * Creates an AngularJS adapter for a specific widget instance.
@@ -86,14 +104,6 @@ export function bootstrap( modules, laxarServices ) {
     *
     * @param {Object}      environment
     * @param {HTMLElement} environment.anchorElement
-    * @param {Object}      environment.context
-    * @param {EventBus}    environment.context.eventBus
-    * @param {Object}      environment.context.features
-    * @param {Function}    environment.context.id
-    * @param {Object}      environment.context.widget
-    * @param {String}      environment.context.widget.area
-    * @param {String}      environment.context.widget.id
-    * @param {String}      environment.context.widget.path
     * @param {Object}      environment.services
     * @param {Object}      environment.specification
     *
@@ -101,6 +111,7 @@ export function bootstrap( modules, laxarServices ) {
     */
    function create( environment ) {
 
+      const { id } = environment.services.axContext.widget;
       let widgetScope;
 
       return {
@@ -113,25 +124,17 @@ export function bootstrap( modules, laxarServices ) {
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       function createController( config ) {
-         if( !bootstrappingScope ) {
-            bootstrappingScope = $rootScope.$new();
-            bootstrappingScope.i18n = {
-               locale: 'default',
-               tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
-            };
-         }
-         widgetScope = ng.extend( bootstrappingScope.$new(), environment.context );
-         activeWidgetServices[ environment.context.widget.id ] = environment.services;
+         const { services, specification } = environment;
 
-         const moduleKey = normalize( environment.specification.name );
+         widgetScope = services.axContext;
+         activeWidgetServices[ id ] = environment.services;
+
+         const moduleKey = normalize( specification.name );
          const controllerName = controllerNames[ moduleKey ];
-         const availableInjections = Object.freeze( {
-            ...environment.services,
-            $scope: widgetScope
-         } );
+         services.$scope = widgetScope;
 
-         config.onBeforeControllerCreation( environment, availableInjections );
-         $controller( controllerName, availableInjections );
+         config.onBeforeControllerCreation( environment, services );
+         $controller( controllerName, services );
       }
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +172,7 @@ export function bootstrap( modules, laxarServices ) {
 
       function destroy() {
          widgetScope.$destroy();
-         delete activeWidgetServices[ environment.context.widget.id ];
+         delete activeWidgetServices[ id ];
       }
 
    }
