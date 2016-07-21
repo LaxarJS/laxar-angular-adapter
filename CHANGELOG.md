@@ -2,7 +2,8 @@
 
 ## Last Changes
 
-- [#17](https://github.com/LaxarJS/laxar-react-adapter/issues/17): project: turned framework dependencies into peer-dependencies
+- [#16](https://github.com/LaxarJS/laxar-angular-adapter/issues/16): services: provided access to widget specific services
+- [#17](https://github.com/LaxarJS/laxar-angular-adapter/issues/17): project: turned framework dependencies into peer-dependencies
 - [#5](https://github.com/LaxarJS/laxar-angular-adapter/issues/5): services: added AngularJS injections for widget services
 - [#14](https://github.com/LaxarJS/laxar-angular-adapter/issues/14): directives: removed layout directive
     + **BREAKING CHANGE:** see ticket for details

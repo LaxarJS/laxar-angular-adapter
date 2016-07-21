@@ -5,6 +5,7 @@
  */
 import ng from 'angular';
 import ngSanitizeModule from 'angular-sanitize';
+import { assert } from 'laxar';
 import { name as idModuleName } from './lib/directives/id';
 import { name as widgetAreaModuleName } from './lib/directives/widget_area';
 import { name as profilingModuleName } from './lib/profiling/profiling';
@@ -59,6 +60,8 @@ export function bootstrap( modules, laxarServices ) {
       const moduleKey = normalize( module.name );
       controllerNames[ moduleKey ] = `${capitalize( module.name )}Controller`;
    } );
+
+   const activeWidgetServices = {};
 
    let $controller;
    let $compile;
@@ -118,6 +121,7 @@ export function bootstrap( modules, laxarServices ) {
             };
          }
          widgetScope = ng.extend( bootstrappingScope.$new(), environment.context );
+         activeWidgetServices[ environment.context.widget.id ] = environment.services;
 
          const moduleKey = normalize( environment.specification.name );
          const controllerName = controllerNames[ moduleKey ];
@@ -165,6 +169,7 @@ export function bootstrap( modules, laxarServices ) {
 
       function destroy() {
          widgetScope.$destroy();
+         delete activeWidgetServices[ environment.context.widget.id ];
       }
 
    }
@@ -186,7 +191,31 @@ export function bootstrap( modules, laxarServices ) {
          .factory( 'axGlobalStorage', () => laxarServices.storage )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )
          .factory( 'axI18n', () => laxarServices.i18n )
-         .factory( 'axTooling', () => laxarServices.toolingProviders );
+         .factory( 'axTooling', () => laxarServices.toolingProviders )
+         .factory( 'axWidgetServices', () => createWidgetServiceProvider() );
+   }
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   function createWidgetServiceProvider() {
+      return scope => {
+         let currentScope = scope;
+         let widgetId = null;
+         while( !widgetId && currentScope ) {
+            if( currentScope.widget && typeof currentScope.widget.id === 'string' ) {
+               widgetId = currentScope.widget.id;
+               break;
+            }
+            currentScope = currentScope.$parent;
+         }
+
+         assert.state( widgetId, 'No widget context found in given scope or one of its parents.' );
+
+         const services = activeWidgetServices[ widgetId ];
+         assert.state( services, `No services found for widget with id ${widgetId}.` );
+
+         return services;
+      };
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
