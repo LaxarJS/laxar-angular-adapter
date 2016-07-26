@@ -39,11 +39,7 @@ let injectorCreated = false;
  * @param {Object} laxarServices
  *   adapter-visible laxarjs services
  *
- * @return {{
- *   technology: String,
- *   create: Function,
- *   applyViewChanges: Function
- * }}
+ * @return {Object}
  *   The instantiated adapter factory.
  */
 export function bootstrap( modules, laxarServices ) {
@@ -51,8 +47,7 @@ export function bootstrap( modules, laxarServices ) {
    const api = {
       create,
       serviceDecorators,
-      technology,
-      applyViewChanges
+      technology
    };
 
    // register controllers under normalized module names that can also be derived from the widget.json name:
@@ -75,6 +70,8 @@ export function bootstrap( modules, laxarServices ) {
       createAngularAdapterModule();
       ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
    }
+
+   laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
 
    return api;
 
@@ -175,12 +172,6 @@ export function bootstrap( modules, laxarServices ) {
          delete activeWidgetServices[ id ];
       }
 
-   }
-
-   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-   function applyViewChanges() {
-      $rootScope.$apply();
    }
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -29,6 +29,8 @@ let widgetFeatures;
 let anchor;
 
 let widgetServices;
+let heartbeatMock;
+let heartbeatListeners;
 
 let angularBootstrap;
 
@@ -50,6 +52,12 @@ beforeEach( () => {
       idGenerator: () => 'fake-id',
       eventBus: createEventBusMock(),
       release: jasmine.createSpy( 'widgetServices.release' )
+   };
+   heartbeatListeners = [];
+   heartbeatMock = {
+      registerHeartbeatListener: jasmine.createSpy( 'registerHeartbeatListener' ).and.callFake( f => {
+         heartbeatListeners.push( f );
+      } )
    };
 } );
 
@@ -75,6 +83,7 @@ describe( 'An angular widget adapter module', () => {
          logMock = createLogMock();
          bootstrap( [], {
             configuration: createConfigurationMock(),
+            heartbeat: heartbeatMock,
             log: logMock
          } );
          module( ANGULAR_MODULE_NAME );
@@ -119,13 +128,14 @@ describe( 'An angular widget adapter', () => {
 
       adapterFactory = bootstrap( [ widgetModule ], {
          configuration: createConfigurationMock(),
+         heartbeat: heartbeatMock,
          log: createLogMock()
       } );
 
       module( ANGULAR_MODULE_NAME );
       module( $provide => {
          $provide.value( '$rootScope', {
-            $apply: jasmine.createSpy( '$rootScope.$apply' ),
+            $digest: jasmine.createSpy( '$rootScope.$digest' ),
             $destroy: () => {}
          } );
       } );
@@ -162,11 +172,17 @@ describe( 'An angular widget adapter', () => {
 
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   it( 'for applyViewChanges() calls $apply on the $rootScope', () => {
-      inject( $rootScope => {
-         adapterFactory.applyViewChanges();
+   it( 'registers a heartbeat listener', () => {
+      expect( heartbeatMock.registerHeartbeatListener ).toHaveBeenCalled();
+   } );
 
-         expect( $rootScope.$apply ).toHaveBeenCalled();
+   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   it( 'starts a $digest cycle on the $rootScope on heart beat', () => {
+      inject( $rootScope => {
+         heartbeatListeners.forEach( _ => { _(); } );
+
+         expect( $rootScope.$digest ).toHaveBeenCalled();
       } );
    } );
 

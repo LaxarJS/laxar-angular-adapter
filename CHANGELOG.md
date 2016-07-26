@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#19](https://github.com/LaxarJS/laxar-angular-adapter/issues/19): removed applyViewChanges in favor of a heartbeat listener
 - [#18](https://github.com/LaxarJS/laxar-angular-adapter/issues/18): services: share the same object for $scope and axContext injections
 - [#16](https://github.com/LaxarJS/laxar-angular-adapter/issues/16): services: provided access to widget specific services
 - [#17](https://github.com/LaxarJS/laxar-angular-adapter/issues/17): project: turned framework dependencies into peer-dependencies
