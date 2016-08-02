@@ -29,8 +29,6 @@ let widgetFeatures;
 let anchor;
 
 let widgetServices;
-let heartbeatMock;
-let heartbeatListeners;
 
 let angularBootstrap;
 
@@ -53,17 +51,11 @@ beforeEach( () => {
       eventBus: createEventBusMock(),
       release: jasmine.createSpy( 'widgetServices.release' )
    };
-   heartbeatListeners = [];
-   heartbeatMock = {
-      registerHeartbeatListener: jasmine.createSpy( 'registerHeartbeatListener' ).and.callFake( f => {
-         heartbeatListeners.push( f );
-      } )
-   };
 } );
 
 afterEach( reset );
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 describe( 'An angular widget adapter module', () => {
 
@@ -83,7 +75,6 @@ describe( 'An angular widget adapter module', () => {
          logMock = createLogMock();
          bootstrap( [], {
             configuration: createConfigurationMock(),
-            heartbeat: heartbeatMock,
             log: logMock
          } );
          module( ANGULAR_MODULE_NAME );
@@ -107,7 +98,7 @@ describe( 'An angular widget adapter module', () => {
 
 } );
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 describe( 'An angular widget adapter', () => {
 
@@ -128,18 +119,10 @@ describe( 'An angular widget adapter', () => {
 
       adapterFactory = bootstrap( [ widgetModule ], {
          configuration: createConfigurationMock(),
-         heartbeat: heartbeatMock,
          log: createLogMock()
       } );
 
       module( ANGULAR_MODULE_NAME );
-      module( $provide => {
-         $provide.value( '$rootScope', {
-            $digest: jasmine.createSpy( '$rootScope.$digest' ),
-            $destroy: () => {}
-         } );
-      } );
-
       // fake start of the application
       angularBootstrap( {}, [ ANGULAR_MODULE_NAME ] );
 
@@ -170,23 +153,24 @@ describe( 'An angular widget adapter', () => {
       adapter = adapterFactory.create( environment );
    } );
 
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   it( 'registers a heartbeat listener', () => {
-      expect( heartbeatMock.registerHeartbeatListener ).toHaveBeenCalled();
-   } );
-
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-   it( 'starts a $digest cycle on the $rootScope on heart beat', () => {
+   it( 'schedules ES2015 promises through the $digest cycle', done => {
       inject( $rootScope => {
-         heartbeatListeners.forEach( _ => { _(); } );
-
-         expect( $rootScope.$digest ).toHaveBeenCalled();
+         let resolved = false;
+         Promise.resolve().then( () => {
+            resolved = true;
+         } );
+         setTimeout( () => {
+            expect( resolved ).toBe( false );
+            $rootScope.$digest();
+            expect( resolved ).toBe( true );
+            done();
+         }, 0 );
       } );
    } );
 
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    describe( 'asked to instantiate a widget controller', () => {
 
@@ -199,32 +183,32 @@ describe( 'An angular widget adapter', () => {
          } );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'instantiates the widget controller with a scope', () => {
          expect( controllerScope.$new ).toBeDefined();
          expect( controllerScope.features ).toEqual( widgetFeatures );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'injects the event bus instance for the widget as service (laxar#107)', () => {
          expect( injectedEventBus ).toEqual( controllerScope.eventBus );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'uses the same injection for $scope and axContext (#18)', () => {
          expect( controllerScope ).toBe( injectedContext );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'injects a context for the widget as service (laxar#167)', () => {
          expect( injectedContext ).toEqual( environment.services.axContext );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'calls onBeforeControllerCreation with environment and injections', () => {
          expect( onBeforeControllerCreationSpy ).toHaveBeenCalled();
@@ -238,7 +222,7 @@ describe( 'An angular widget adapter', () => {
 
    } );
 
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    describe( 'asked to attach its DOM representation', () => {
 
@@ -250,14 +234,14 @@ describe( 'An angular widget adapter', () => {
          adapter.domAttachTo( mockAreaNode, assets[ htmlAssetPath ] );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'links the widget template', () => {
          expect( document.querySelector( 'i', anchor ) ).toBe( null );
          expect( anchor.innerHTML ).not.toEqual( '' );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'attaches its representation to the given widget area', () => {
          expect( mockAreaNode.children.length ).toBe( 1 );
@@ -266,7 +250,7 @@ describe( 'An angular widget adapter', () => {
          expect( anchor.className ).toEqual( 'ng-scope' );
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       describe( 'and then to detach it again', () => {
 
@@ -275,13 +259,13 @@ describe( 'An angular widget adapter', () => {
             adapter.domDetach();
          } );
 
-         //////////////////////////////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
          it( 'detaches its dom node from the widget area', () => {
             expect( mockAreaNode.children.length ).toBe( 0 );
          } );
 
-         //////////////////////////////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
          it( 'retains its widget services and scope', () => {
             expect( widgetServices.release ).not.toHaveBeenCalled();
@@ -290,7 +274,7 @@ describe( 'An angular widget adapter', () => {
 
       } );
 
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       describe( 'and then to destroy itself', () => {
 
@@ -299,7 +283,7 @@ describe( 'An angular widget adapter', () => {
             adapter.destroy();
          } );
 
-         //////////////////////////////////////////////////////////////////////////////////////////////////
+         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
          it( 'destroys the corresponding angular scope', () => {
             expect( controllerScope.$destroy ).toHaveBeenCalled();

@@ -71,8 +71,6 @@ export function bootstrap( modules, laxarServices ) {
       ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
    }
 
-   laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
-
    return api;
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,7 +151,9 @@ export function bootstrap( modules, laxarServices ) {
          element.html( templateHtml );
          areaElement.appendChild( environment.anchorElement );
          $compile( environment.anchorElement )( widgetScope );
-         widgetScope.$digest();
+         if( !$rootScope.$$phase ) {
+            widgetScope.$digest();
+         }
       }
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,11 +227,13 @@ export function bootstrap( modules, laxarServices ) {
 
       const externalDependencies = ( modules || [] ).map( _ => _.name );
 
-      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] )
-         .run( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
+      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
+         [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
             $controller = _$controller_;
             $compile = _$compile_;
             $rootScope = _$rootScope_;
+
+            installAngularPromise( $q );
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
@@ -244,6 +246,28 @@ export function bootstrap( modules, laxarServices ) {
 
    }
 
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function installAngularPromise( $q ) {
+   const BrowserPromise = window.Promise;
+   function AngularPromise( callback ) {
+      const _ = $q.defer();
+      callback(
+         value => { _.resolve( value ); },
+         error => { _.reject( error ); }
+      );
+      return _.promise;
+   }
+   AngularPromise.race = $q.race || ( promises =>
+      AngularPromise( ( resolve, reject ) => {
+         return BrowserPromise.race( promises ).then( resolve, reject );
+      } ) );
+   AngularPromise.all = $q.all;
+   AngularPromise.resolve = $q.when;
+   AngularPromise.reject = $q.reject;
+   window.Promise = AngularPromise;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

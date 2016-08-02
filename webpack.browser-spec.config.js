@@ -18,7 +18,7 @@ const WebpackJasmineHtmlRunnerPlugin = require( 'webpack-jasmine-html-runner-plu
 const baseConfig = require( './webpack.base.config' );
 const config = Object.assign( {}, baseConfig );
 
-config.entry = WebpackJasmineHtmlRunnerPlugin.entry( './spec/[name]-runner.js' );
+config.entry = WebpackJasmineHtmlRunnerPlugin.entry( './spec/spec-runner.js', './lib/*/spec/spec-runner.js' );
 config.entry.polyfills = require.resolve( 'laxar/dist/polyfills' );
 config.output = {
    path: path.resolve( path.join( process.cwd(), 'spec-output' ) ),
