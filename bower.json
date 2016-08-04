@@ -1,7 +1,7 @@
 {
   "name": "laxar-angular-adapter",
   "description": "Write LaxarJS widgets and controls with AngularJS",
-  "main": "laxar.js",
+  "main": "laxar-angular-adapter.js",
   "authors": [
     "aixigo AG"
   ],

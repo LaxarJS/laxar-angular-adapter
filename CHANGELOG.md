@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#21](https://github.com/LaxarJS/laxar-angular-adapter/issues/21): fixed bower.json `main` entry
 - [#20](https://github.com/LaxarJS/laxar-angular-adapter/issues/20): patched window.Promise to integrate with $q
 - [#19](https://github.com/LaxarJS/laxar-angular-adapter/issues/19): removed applyViewChanges in favor of a heartbeat listener
 - [#18](https://github.com/LaxarJS/laxar-angular-adapter/issues/18): services: share the same object for $scope and axContext injections
