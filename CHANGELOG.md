@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#22](https://github.com/LaxarJS/laxar-angular-adapter/issues/22): removed AngularJS specific `axI18n` injection in favor of widget-services version
 - [#21](https://github.com/LaxarJS/laxar-angular-adapter/issues/21): fixed bower.json `main` entry
 - [#20](https://github.com/LaxarJS/laxar-angular-adapter/issues/20): patched window.Promise to integrate with $q
 - [#19](https://github.com/LaxarJS/laxar-angular-adapter/issues/19): removed applyViewChanges in favor of a heartbeat listener

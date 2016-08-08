@@ -21,13 +21,12 @@ The following list covers these:
 * [`axGlobalLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axgloballog-)
 * [`axGlobalStorage`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axglobalstorage-)
 * [`axHeartbeat`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axheartbeat-)
-* [`axI18n`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axi18n-)
 * [`axTooling`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axtooling-)
 
 
 ### axWidgetServices
 
-Additionally an `axWidgetServices` service is available, which can be used by directives to gain access to services that are only available in the context of a specific widget, such as [`axFeatures`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axfeatures-) or the decorated log for widgets ([`axLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axlog-)).
+Additionally an `axWidgetServices` service is available, which can be used by directives to gain access to services that are only available in the context of a specific widget, such as [`axFeatures`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axfeatures-), [`axI18n`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axi18n-) or the decorated log for widgets ([`axLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axlog-)).
 The `axWidgetServices` is a function, that must be called with scope of the directive and it returns the map of services that are available for the widget being the same as or a parent of the directive scope in the scope hierarchy.
 As a consequence an error is thrown if this service is used with a scope not being (a child of) a widget scope.
 

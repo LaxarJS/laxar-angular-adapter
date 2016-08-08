@@ -184,7 +184,6 @@ export function bootstrap( modules, laxarServices ) {
          .factory( 'axGlobalLog', () => laxarServices.log )
          .factory( 'axGlobalStorage', () => laxarServices.storage )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )
-         .factory( 'axI18n', () => laxarServices.i18n )
          .factory( 'axTooling', () => laxarServices.toolingProviders )
          .factory( 'axWidgetServices', () => createWidgetServiceProvider() );
    }
