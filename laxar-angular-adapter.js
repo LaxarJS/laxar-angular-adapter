@@ -39,10 +39,13 @@ let injectorCreated = false;
  * @param {Object} laxarServices
  *   adapter-visible laxarjs services
  *
+ * @param {Object} anchorElement
+ *   the root HTML element of the owning LaxarJS bootstrapping instance
+ *
  * @return {Object}
  *   The instantiated adapter factory.
  */
-export function bootstrap( modules, laxarServices ) {
+export function bootstrap( modules, laxarServices, anchorElement ) {
 
    const api = {
       create,
@@ -62,14 +65,13 @@ export function bootstrap( modules, laxarServices ) {
    let $controller;
    let $compile;
    let $rootScope;
-   let bootstrappingScope;
    // Instantiate the AngularJS modules and bootstrap angular, but only the first time!
    if( !injectorCreated ) {
       injectorCreated = true;
       createAngularServicesModule();
       createAngularAdapterModule();
-      ng.bootstrap( document, [ ANGULAR_MODULE_NAME ] );
    }
+   ng.bootstrap( anchorElement, [ ANGULAR_MODULE_NAME ] );
 
    return api;
 
@@ -78,14 +80,11 @@ export function bootstrap( modules, laxarServices ) {
    function serviceDecorators() {
       return {
          axContext( context ) {
-            if( !bootstrappingScope ) {
-               bootstrappingScope = $rootScope.$new();
-               bootstrappingScope.i18n = {
-                  locale: 'default',
-                  tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
-               };
-            }
-            return ng.extend( bootstrappingScope.$new(), context );
+            $rootScope.i18n = {
+               locale: 'default',
+               tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
+            };
+            return ng.extend( $rootScope.$new(), context );
          }
       };
    }
@@ -250,7 +249,7 @@ export function bootstrap( modules, laxarServices ) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function installAngularPromise( $q ) {
-   const BrowserPromise = window.Promise;
+   AngularPromise.Promise = Promise;
    function AngularPromise( callback ) {
       const _ = $q.defer();
       callback(
@@ -261,7 +260,7 @@ function installAngularPromise( $q ) {
    }
    AngularPromise.race = $q.race || ( promises =>
       AngularPromise( ( resolve, reject ) => {
-         return BrowserPromise.race( promises ).then( resolve, reject );
+         return AngularPromise.Promise.race( promises ).then( resolve, reject );
       } ) );
    AngularPromise.all = $q.all;
    AngularPromise.resolve = $q.when;
@@ -274,6 +273,7 @@ function installAngularPromise( $q ) {
 // For testing, to reset the global AngularJS module state:
 export function reset() {
    injectorCreated = false;
+   window.Promise = window.Promise.Promise || window.Promise;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
