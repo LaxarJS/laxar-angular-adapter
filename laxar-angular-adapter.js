@@ -3,6 +3,20 @@
  * Released under the MIT license.
  * http://laxarjs.org/license
  */
+
+/**
+ * Provides an AngularJS v1.x adapter factory for a laxarjs bootstrapping context.
+ * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
+ *
+ * Because in AngularJS v1.x module registry and injector are global, there are certain restrictions when
+ * bootstrapping multiple LaxarJS applications in the same Browser window:
+ *  - Currently, all AngularJS modules must be available when bootstrapping the first instance, and the
+ *    widget modules for all bootstrapping instances must be passed to the first invocation.
+ *  - Multiple bootstrapping instances share each other's AngularJS modules (e.g. controls).
+ *
+ * @module laxar-angular-adapter
+ */
+
 import ng from 'angular';
 import ngSanitizeModule from 'angular-sanitize';
 import { assert } from 'laxar';
@@ -23,29 +37,7 @@ let injectorCreated = false;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * Provides an AngularJS v1.x adapter factory for a laxarjs bootstrapping context.
- * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
- *
- * Because in AngularJS v1.x module registry and injector are global, there are certain restrictions when
- * bootstrapping multiple LaxarJS applications in the same Browser window:
- *  - Currently, all AngularJS modules must be available when bootstrapping the first instance, and the
- *    widget modules for all bootstrapping instances must be passed to the first invocation.
- *  - Multiple bootstrapping instances share each other's AngularJS modules (e.g. controls).
- *
- * @param {Array} modules
- *   The widget and control modules matching this adapter's technology.
- *
- * @param {Object} laxarServices
- *   adapter-visible laxarjs services
- *
- * @param {Object} anchorElement
- *   the root HTML element of the owning LaxarJS bootstrapping instance
- *
- * @return {Object}
- *   The instantiated adapter factory.
- */
-export function bootstrap( modules, laxarServices, anchorElement ) {
+export function bootstrap( { widgets, controls }, laxarServices, anchorElement ) {
 
    const api = {
       create,
@@ -55,9 +47,8 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
 
    // register controllers under normalized module names that can also be derived from the widget.json name:
    const controllerNames = {};
-   modules.forEach( module => {
-      const moduleKey = normalize( module.name );
-      controllerNames[ moduleKey ] = `${capitalize( module.name )}Controller`;
+   widgets.forEach( ({ descriptor, module }) => {
+      controllerNames[ descriptor.name ] = `${capitalize( module.name )}Controller`;
    } );
 
    const activeWidgetServices = {};
@@ -92,24 +83,14 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    // eslint-disable-next-line valid-jsdoc
-   /**
-    * Creates an AngularJS adapter for a specific widget instance.
-    * https://github.com/LaxarJS/laxar/blob/master/docs/manuals/adapters.md
-    *
-    * @param {Object}      environment
-    * @param {HTMLElement} environment.anchorElement
-    * @param {Object}      environment.services
-    * @param {Object}      environment.specification
-    *
-    * @return {Object}
-    */
-   function create( environment ) {
+   function create( { widgetName, anchorElement, services, onBeforeControllerCreation } ) {
 
-      const { id } = environment.services.axContext.widget;
-      let widgetScope;
+      const widgetScope = services.axContext;
+      const { id } = widgetScope.widget;
+      activeWidgetServices[ id ] = services;
+      createController();
 
       return {
-         createController,
          domAttachTo,
          domDetach,
          destroy
@@ -117,17 +98,10 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      function createController( config ) {
-         const { services, specification } = environment;
-
-         widgetScope = services.axContext;
-         activeWidgetServices[ id ] = environment.services;
-
-         const moduleKey = normalize( specification.name );
-         const controllerName = controllerNames[ moduleKey ];
+      function createController() {
+         const controllerName = controllerNames[ widgetName ];
          services.$scope = widgetScope;
-
-         config.onBeforeControllerCreation( environment, services );
+         onBeforeControllerCreation( services );
          $controller( controllerName, services );
       }
 
@@ -142,14 +116,12 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
        *    The AngularJS HTML template to compile and link to this widget
        */
       function domAttachTo( areaElement, templateHtml ) {
-         if( templateHtml === null ) {
-            return;
-         }
+         if( templateHtml === null ) { return; }
 
-         const element = ng.element( environment.anchorElement );
+         const element = ng.element( anchorElement );
          element.html( templateHtml );
-         areaElement.appendChild( environment.anchorElement );
-         $compile( environment.anchorElement )( widgetScope );
+         areaElement.appendChild( anchorElement );
+         $compile( anchorElement )( widgetScope );
          if( !$rootScope.$$phase ) {
             widgetScope.$digest();
          }
@@ -158,9 +130,9 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       function domDetach() {
-         const parent = environment.anchorElement.parentNode;
+         const parent = anchorElement.parentNode;
          if( parent ) {
-            parent.removeChild( environment.anchorElement );
+            parent.removeChild( anchorElement );
          }
       }
 
@@ -223,7 +195,7 @@ export function bootstrap( modules, laxarServices, anchorElement ) {
          axVisibilityServiceModuleName
       ];
 
-      const externalDependencies = ( modules || [] ).map( _ => _.name );
+      const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
 
       ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
          [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
@@ -280,12 +252,4 @@ export function reset() {
 
 function capitalize( _ ) {
    return _.replace( /^./, _ => _.toUpperCase() );
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function normalize( moduleName ) {
-   return moduleName
-      .replace( /([a-zA-Z0-9])[-_]([a-zA-Z0-9])/g, ( $_, $1, $2 ) => $1 + $2.toUpperCase() )
-      .replace( /^[A-Z]/, $_ => $_.toLowerCase() );
 }
