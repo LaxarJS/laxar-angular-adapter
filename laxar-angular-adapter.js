@@ -155,7 +155,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
          .factory( 'axGlobalLog', () => laxarServices.log )
          .factory( 'axGlobalStorage', () => laxarServices.storage )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )
-         .factory( 'axTooling', () => laxarServices.toolingProviders )
+         .factory( 'axTooling', () => laxarServices.tooling )
          .factory( 'axWidgetServices', () => createWidgetServiceProvider() );
    }
 
