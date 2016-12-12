@@ -41,8 +41,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    const api = {
       create,
-      serviceDecorators,
-      technology
+      serviceDecorators
    };
 
    // register controllers under normalized module names that can also be derived from the widget.json name:

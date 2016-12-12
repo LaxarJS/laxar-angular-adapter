@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#29](https://github.com/LaxarJS/laxar-angular-adapter/issues/29): Removed redundant technology field
 - [#28](https://github.com/LaxarJS/laxar-angular-adapter/issues/28): Fixed tooling api access
 - [#24](https://github.com/LaxarJS/laxar-angular-adapter/issues/24): adjusted to adapter API changes (laxar#358)
 - [#23](https://github.com/LaxarJS/laxar-angular-adapter/issues/23): fixed testability and multi-instance operation
