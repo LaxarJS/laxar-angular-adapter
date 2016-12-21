@@ -153,6 +153,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
          .factory( 'axGlobalEventBus', () => laxarServices.globalEventBus )
          .factory( 'axGlobalLog', () => laxarServices.log )
          .factory( 'axGlobalStorage', () => laxarServices.storage )
+         .factory( 'axFlowService', () => laxarServices.flowService )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )
          .factory( 'axTooling', () => laxarServices.tooling )
          .factory( 'axWidgetServices', () => createWidgetServiceProvider() );
@@ -196,6 +197,8 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
       const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
 
+      let stacksProcessed = 0;
+
       ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
          [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
             $controller = _$controller_;
@@ -206,13 +209,34 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
-               const msg = exception.message || exception;
-               laxarServices.log.error(
-                  `There was an exception: ${msg}, \nstack: ${exception.stack}, \n, Cause: ${cause}`
-               );
+               const { stack, message } = exception;
+               const causeClause = cause ? '\n Cause: ${cause}' : '';
+               if( stack && window.mapStackTrace ) {
+                  ++stacksProcessed;
+                  const stackIndex = stacksProcessed;
+                  handleError(
+                     message || exception,
+                     'preprocessed stack will be logged asynchronously.',
+                     causeClause
+                  );
+                  window.mapStackTrace( stack, mappedStack => {
+                     const stackString = mappedStack.join( '\n' );
+                     laxarServices.log.info(
+                        `Mapped stack #${stackIndex}:\n${stackString}${causeClause}`
+                     );
+                  } );
+               }
+               else {
+                  handleError( message || exception, stack, causeClause );
+               }
             };
          } );
 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      function handleError( msg, stack, causeClause ) {
+         laxarServices.log.error( `There was an exception: ${msg}\n ${stack}${causeClause}` );
+      }
    }
 
 }
