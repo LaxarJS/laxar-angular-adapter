@@ -202,7 +202,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
             $compile = _$compile_;
             $rootScope = _$rootScope_;
 
-            installAngularPromise( $q );
+            installAngularPromise( $q, laxarServices.log );
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
@@ -219,7 +219,16 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function installAngularPromise( $q ) {
+function installAngularPromise( $q, log ) {
+   if( window.Promise.name === 'ZoneAwarePromise' ) {
+      log.warn(
+         'In case the ZoneAwarePromise shim for AngularJS 2 is installed, ' +
+         'window.Promise can no longer be modified for AngularJS 1.\n' +
+         'Additional manual $digest-calls may be necessary in applications mixing AngularJS 1 and 2.'
+      );
+      return;
+   }
+
    AngularPromise.Promise = Promise;
    function AngularPromise( callback ) {
       const _ = $q.defer();

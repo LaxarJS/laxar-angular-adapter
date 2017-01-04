@@ -180,8 +180,6 @@ describe( 'An angular widget adapter', () => {
 
    describe( 'asked to instantiate a widget controller', () => {
 
-      ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
       it( 'instantiates the widget controller with a scope', () => {
          expect( injectedScope.$new ).toBeDefined();
          expect( injectedScope.features ).toEqual( widgetServices.axFeatures );
