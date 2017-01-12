@@ -5,10 +5,11 @@
  */
 import ng from 'angular';
 import 'angular-mocks';
-import { create as createEventBusMock } from 'laxar/lib/testing/event_bus_mock';
-import { create as createConfigurationMock } from 'laxar/lib/testing/configuration_mock';
-import { create as createLogMock } from 'laxar/lib/testing/log_mock';
-import * as features from 'laxar/lib/loaders/features_provider';
+import {
+   createAxEventBusMock,
+   createAxConfigurationMock,
+   createAxLogMock
+} from 'laxar/laxar-widget-service-mocks';
 import { technology, bootstrap, reset, ANGULAR_MODULE_NAME } from '../laxar-angular-adapter';
 import widgetData from './widget_data';
 
@@ -40,8 +41,8 @@ beforeEach( () => {
    };
 
    services = {
-      configuration: createConfigurationMock(),
-      log: createLogMock()
+      configuration: createAxConfigurationMock(),
+      log: createAxLogMock()
    };
 } );
 
@@ -98,12 +99,8 @@ describe( 'An angular widget adapter', () => {
 
       widgetServices = {
          axContext: null,
-         axEventBus: createEventBusMock(),
-         axFeatures: features.featuresForWidget(
-            widgetData.descriptor,
-            widgetData.configuration,
-            msg => { throw new Error( msg ); }
-         ),
+         axEventBus: createAxEventBusMock(),
+         axFeatures: { myProp: 'x' },
          axId: () => 'fake-id',
          release: jasmine.createSpy( 'widgetServices.release' )
       };
