@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+
+## v0.3.0
+
 - [#7](https://github.com/LaxarJS/laxar-angular-adapter/issues/7): changed the `axVisibilityService` used by directives to use `axWidgetServices`
    + **BREAKING CHANGE:** see ticket for details
 - [#29](https://github.com/LaxarJS/laxar-angular-adapter/issues/29): Removed redundant technology field

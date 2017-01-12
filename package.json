@@ -1,6 +1,6 @@
 {
   "name": "laxar-angular-adapter",
-  "version": "0.3.0-pre",
+  "version": "0.3.0",
   "description": "Write LaxarJS widgets and controls with AngularJS",
   "main": "laxar-angular-adapter.js",
   "scripts": {
