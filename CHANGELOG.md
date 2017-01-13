@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#30](https://github.com/LaxarJS/laxar-angular-adapter/issues/30): Made patching angular promises defensive
+
 
 ## v0.3.0
 
