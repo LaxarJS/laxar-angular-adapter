@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#30](https://github.com/LaxarJS/laxar-angular-adapter/issues/30): Made patching angular promises defensive
 - [#29](https://github.com/LaxarJS/laxar-angular-adapter/issues/29): Removed redundant technology field
 - [#28](https://github.com/LaxarJS/laxar-angular-adapter/issues/28): Fixed tooling api access
 - [#24](https://github.com/LaxarJS/laxar-angular-adapter/issues/24): adjusted to adapter API changes (laxar#358)
