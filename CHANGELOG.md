@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#31](https://github.com/LaxarJS/laxar-angular-adapter/issues/31): Made patching Promise zone.js compatible
 - [#30](https://github.com/LaxarJS/laxar-angular-adapter/issues/30): Made patching angular promises defensive
 
 

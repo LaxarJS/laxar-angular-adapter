@@ -202,7 +202,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
             $compile = _$compile_;
             $rootScope = _$rootScope_;
 
-            installAngularPromise( $q, laxarServices.log );
+            installAngularPromise( $q, $rootScope );
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
@@ -217,35 +217,41 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-function installAngularPromise( $q, log ) {
-   if( window.Promise.name === 'ZoneAwarePromise' ) {
-      log.warn(
-         'In case the ZoneAwarePromise shim for AngularJS 2 is installed, ' +
-         'window.Promise can no longer be modified for AngularJS 1.\n' +
-         'Additional manual $digest-calls may be necessary in applications mixing AngularJS 1 and 2.'
-      );
+function installAngularPromise( $q, $rootScope ) {
+   if( !window.Zone ) {
+      const NativePromise = window.Promise;
+      window.Promise = $q;
+      window.Promise._reset = () => { window.Promise = NativePromise; };
       return;
    }
 
-   AngularPromise.Promise = Promise;
-   function AngularPromise( callback ) {
-      const _ = $q.defer();
-      callback(
-         value => { _.resolve( value ); },
-         error => { _.reject( error ); }
-      );
-      return _.promise;
-   }
-   AngularPromise.race = $q.race || ( promises =>
-      AngularPromise( ( resolve, reject ) => {
-         return AngularPromise.Promise.race( promises ).then( resolve, reject );
-      } ) );
-   AngularPromise.all = $q.all;
-   AngularPromise.resolve = $q.when;
-   AngularPromise.reject = $q.reject;
-   window.Promise = AngularPromise;
+   // When we got here, the angular2 adapter is most probably active as well and zone.js has installed its
+   // zone aware promise we cannot simply overwrite.
+   // So we need to hook into the then method and trigger a digest cycle whenever a promise is resolved.
+   const ZoneAwarePromise = window.Promise;
+   const ZoneAwarePromiseThen = ZoneAwarePromise.prototype.then;
+   ZoneAwarePromise.prototype.then = function( onFulfilled, onRejected ) {
+      return ZoneAwarePromiseThen.call( this, forward( onFulfilled ), forward( onRejected ) );
+
+      function forward( callback ) {
+         if( typeof callback !== 'function' ) {
+            return callback;
+         }
+
+         return ( ...args ) => {
+            try {
+               return callback( ...args );
+            }
+            finally {
+               $rootScope.$evalAsync( () => {} );
+            }
+         };
+      }
+   };
+   window.Promise._reset = () => {
+      ZoneAwarePromise.prototype.then = ZoneAwarePromiseThen;
+      delete window.Promise._reset;
+   };
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,7 +259,9 @@ function installAngularPromise( $q, log ) {
 // For testing, to reset the global AngularJS module state:
 export function reset() {
    injectorCreated = false;
-   window.Promise = window.Promise.Promise || window.Promise;
+   if( typeof window.Promise._reset === 'function' ) {
+      window.Promise._reset();
+   }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
