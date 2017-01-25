@@ -10,10 +10,9 @@ delete webpackConfig.entry;
 webpackConfig.devtool = 'inline-source-map';
 
 module.exports = function(config) {
-   // const browsers = [ 'PhantomJS', 'Firefox' ].concat( [
-   //    process.env.TRAVIS ? 'ChromeTravisCi' : 'Chrome'
-   // ] );
-   const browsers = [ 'Chrome' ];
+   const browsers = [ 'PhantomJS', 'Firefox' ].concat( [
+      process.env.TRAVIS ? 'ChromeTravisCi' : 'Chrome'
+   ] );
 
    config.set( {
       frameworks: [ 'jasmine' ],
