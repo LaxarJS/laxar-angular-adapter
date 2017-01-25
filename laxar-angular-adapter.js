@@ -82,7 +82,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
    // eslint-disable-next-line valid-jsdoc
-   function create( { widgetName, anchorElement, services, onBeforeControllerCreation } ) {
+   function create( { widgetName, anchorElement, services, provideServices } ) {
 
       const widgetScope = services.axContext;
       const { id } = widgetScope.widget;
@@ -100,7 +100,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
       function createController() {
          const controllerName = controllerNames[ widgetName ];
          services.$scope = widgetScope;
-         onBeforeControllerCreation( services );
+         provideServices( services );
          $controller( controllerName, services );
       }
 

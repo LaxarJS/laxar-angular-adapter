@@ -89,13 +89,13 @@ describe( 'An angular widget adapter module', () => {
 describe( 'An angular widget adapter', () => {
 
    let anchorElement;
-   let onBeforeControllerCreation;
+   let provideServices;
    let widgetServices;
 
    beforeEach( () => {
       anchorElement = document.createElement( 'div' );
 
-      onBeforeControllerCreation = jasmine.createSpy( 'onBeforeControllerCreation' );
+      provideServices = jasmine.createSpy( 'provideServices' );
 
       widgetServices = {
          axContext: null,
@@ -138,7 +138,7 @@ describe( 'An angular widget adapter', () => {
 
       const environment = {
          anchorElement,
-         onBeforeControllerCreation,
+         provideServices,
          services: widgetServices,
          widgetName: widgetData.descriptor.name
       };
@@ -202,10 +202,10 @@ describe( 'An angular widget adapter', () => {
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      it( 'calls onBeforeControllerCreation with environment and injections', () => {
-         expect( onBeforeControllerCreation ).toHaveBeenCalled();
+      it( 'calls provideServices with the widget injections', () => {
+         expect( provideServices ).toHaveBeenCalled();
 
-         const [ services ] = onBeforeControllerCreation.calls.argsFor( 0 );
+         const [ services ] = provideServices.calls.argsFor( 0 );
          expect( Object.keys( services ) ).toContain( 'axContext' );
          expect( Object.keys( services ) ).toContain( 'axEventBus' );
          expect( Object.keys( services ) ).toContain( '$scope' );

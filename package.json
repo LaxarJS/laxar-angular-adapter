@@ -20,7 +20,7 @@
   "peerDependencies": {
      "angular": "^1.5.7",
      "angular-sanitize": "^1.5.7",
-     "laxar": "^2.0.0-alpha.13"
+     "laxar": "^2.0.0-alpha.14"
   },
   "keywords": [
     "LaxarJS",
