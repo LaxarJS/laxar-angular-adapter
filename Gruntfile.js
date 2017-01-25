@@ -16,12 +16,12 @@ module.exports = function (grunt) {
    preprocessors[ '**/laxar.js' ] = [ 'webpack', 'sourcemap' ];
 
    grunt.initConfig( {
-      pkg: pkg,
+      pkg,
       pkgFile: 'package.json',
       karma: {
          options: {
             configFile: 'karma.config.js',
-            preprocessors: preprocessors
+            preprocessors
          },
          adapter: {
             options: {
