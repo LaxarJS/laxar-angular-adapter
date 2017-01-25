@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#33](https://github.com/LaxarJS/laxar-angular-adapter/issues/33): fixed imports of `laxar-widget-service-mocks`
 - [#32](https://github.com/LaxarJS/laxar-angular-adapter/issues/32): adapted to laxar API change (LaxarJS/laxar#413)
    + **BREAKING CHANGE:** see ticket for details
 - [#31](https://github.com/LaxarJS/laxar-angular-adapter/issues/31): Made patching Promise zone.js compatible

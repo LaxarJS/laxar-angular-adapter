@@ -9,12 +9,16 @@ module.exports = {
    entry: {
       'laxar-angular-adapter': './laxar-angular-adapter.js'
    },
+   resolve: {
+      alias: {
+         'laxar-widget-service-mocks': 'laxar/dist/laxar-widget-service-mocks'
+      }
+   },
    module: {
-      noParse: /node_modules\/page\/page\.js/,
       loaders: [
          {
             test: /\.js$/,
-            exclude: /node_modules\/(?!laxar)/,
+            exclude: /node_modules/,
             loader: 'babel-loader'
          }
       ]

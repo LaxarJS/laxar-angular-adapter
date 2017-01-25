@@ -9,7 +9,7 @@ import {
    createAxEventBusMock,
    createAxConfigurationMock,
    createAxLogMock
-} from 'laxar/laxar-widget-service-mocks';
+} from 'laxar-widget-service-mocks';
 import { technology, bootstrap, reset, ANGULAR_MODULE_NAME } from '../laxar-angular-adapter';
 import widgetData from './widget_data';
 
