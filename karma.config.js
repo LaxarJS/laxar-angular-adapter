@@ -1,23 +1,24 @@
 /**
- * Copyright 2015 aixigo AG
+ * Copyright 2017 aixigo AG
  * Released under the MIT license.
  * http://laxarjs.org/license
  */
 /* eslint-env node */
 
-const webpackConfig = Object.assign( {}, require('./webpack.base.config' ) );
+const webpackConfig = Object.assign( {}, require('./webpack.config' ) );
 delete webpackConfig.entry;
 webpackConfig.devtool = 'inline-source-map';
 
 module.exports = function(config) {
-   const browsers = [ 'PhantomJS', 'Firefox' ].concat( [
-      process.env.TRAVIS ? 'ChromeTravisCi' : 'Chrome'
-   ] );
+   // const browsers = [ 'PhantomJS', 'Firefox' ].concat( [
+   //    process.env.TRAVIS ? 'ChromeTravisCi' : 'Chrome'
+   // ] );
+   const browsers = [ 'Chrome' ];
 
    config.set( {
       frameworks: [ 'jasmine' ],
       files: [
-         require.resolve( 'laxar/dist/polyfills' ),
+         // require.resolve( 'laxar/dist/polyfills' ),
          'lib/**/spec/spec-runner.js',
          'spec/spec-runner.js'
       ],

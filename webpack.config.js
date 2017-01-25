@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 aixigo AG
+ * Copyright 2017 aixigo AG
  * Released under the MIT license.
  * http://laxarjs.org/license
  */
@@ -8,63 +8,96 @@
 const path = require( 'path' );
 const webpack = require( 'webpack' );
 
-const baseConfig = require( './webpack.base.config' );
+const nodeEnv = process.env.NODE_ENV;
+const isProduction = nodeEnv === 'production';
+const isBrowserSpec = nodeEnv === 'browser-spec';
 
-module.exports = [
-   distConfig(),
-   distMinConfig()
-];
+const name = require( './package.json' ).name;
+const externals = {
+   'laxar': 'laxar',
+   'angular': 'angular',
+   'angular-sanitize': 'angular-sanitize'
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const baseConfig = {
+   resolve: {
+      alias: {
+         'laxar-widget-service-mocks': 'laxar/dist/laxar-widget-service-mocks'
+      }
+   },
+   module: {
+      rules: [
+         {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader'
+         }
+      ]
+   }
+};
+
+const config = isProduction ? distConfig() : baseConfig;
+
+if( isBrowserSpec ) {
+   const WebpackJasmineHtmlRunnerPlugin = require( 'webpack-jasmine-html-runner-plugin' );
+   config.entry = WebpackJasmineHtmlRunnerPlugin.entry( './spec/spec-runner.js' );
+   config.plugins = [ new WebpackJasmineHtmlRunnerPlugin() ];
+   config.output = {
+      path: path.resolve( path.join( process.cwd(), 'spec-output' ) ),
+      publicPath: '/spec-output/',
+      filename: '[name].bundle.js'
+   };
+}
+
+module.exports = config;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function distConfig() {
 
-   const config = Object.assign( {}, baseConfig );
-
-   config.output = {
-      path: path.resolve( __dirname ),
-      filename: 'dist/laxar-angular-adapter.js',
-      library: 'laxar-angular-adapter',
-      libraryTarget: 'umd',
-      umdNamedDefine: true
-   };
-
-   config.externals = {
-      'laxar': 'laxar',
-      'angular': 'angular',
-      'angular-sanitize': 'angular-sanitize'
-   };
-
-   config.plugins = [
-      new webpack.SourceMapDevToolPlugin( {
-         filename: 'dist/laxar-angular-adapter.js.map'
-      } )
+   return [
+      distConfigItem( `./${name}.js`, `./${name}.js` ),
+      distConfigItem( `./${name}.js`, `./${name}.min.js`, { minify: true } )
    ];
 
-   return config;
-}
+   function distConfigItem( entry, output, optionalOptions ) {
+      const options = Object.assign( {
+         minify: false,
+         externals
+      }, optionalOptions || {} );
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      const config = Object.assign( {}, baseConfig );
 
-function distMinConfig() {
+      config.entry = entry;
 
-   const config = Object.assign( {}, distConfig() );
+      config.output = {
+         path: path.resolve( __dirname ),
+         filename: `dist/${output}`,
+         library: name,
+         libraryTarget: 'umd',
+         umdNamedDefine: true
+      };
 
-   config.output = Object.assign( {}, config.output, {
-      filename: 'dist/laxar-angular-adapter.min.js'
-   } );
+      config.externals = options.externals;
 
-   config.plugins = [
-      new webpack.SourceMapDevToolPlugin( {
-         filename: 'dist/laxar-angular-adapter.min.js.map'
-      } ),
-      new webpack.optimize.UglifyJsPlugin( {
-         compress: {
-            warnings: false
-         },
-         sourceMap: true
-      } )
-   ];
+      config.plugins = [
+         new webpack.SourceMapDevToolPlugin( {
+            filename: `dist/${output}.map`
+         } )
+      ];
 
-   return config;
+      if( options.minify ) {
+         config.plugins.push(
+            new webpack.optimize.UglifyJsPlugin( {
+               compress: { warnings: false },
+               sourceMap: true
+            } )
+         );
+      }
+
+      return config;
+   }
+
 }
