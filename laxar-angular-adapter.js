@@ -55,12 +55,25 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
    let $controller;
    let $compile;
    let $rootScope;
+
    // Instantiate the AngularJS modules and bootstrap angular, but only the first time!
    if( !injectorCreated ) {
       injectorCreated = true;
       createAngularServicesModule();
       createAngularAdapterModule();
    }
+   ng.injector( [ 'ng', ANGULAR_MODULE_NAME ] )
+      .invoke( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
+         $controller = _$controller_;
+         $compile = _$compile_;
+         $rootScope = _$rootScope_;
+
+         $rootScope.i18n = {
+            locale: 'default',
+            tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
+         };
+      } ] );
+
    ng.bootstrap( anchorElement, [ ANGULAR_MODULE_NAME ] );
 
    return api;
@@ -70,10 +83,6 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
    function serviceDecorators() {
       return {
          axContext( context ) {
-            $rootScope.i18n = {
-               locale: 'default',
-               tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
-            };
             return ng.extend( $rootScope.$new(), context );
          }
       };
@@ -196,14 +205,8 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
       const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
 
-      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
-         [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
-            $controller = _$controller_;
-            $compile = _$compile_;
-            $rootScope = _$rootScope_;
-
-            installAngularPromise( $q, $rootScope );
-         } ] )
+      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] )
+         .run( [ '$q', '$rootScope', installAngularPromise ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
                const msg = exception.message || exception;
