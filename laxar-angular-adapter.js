@@ -62,17 +62,10 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
       createAngularServicesModule();
       createAngularAdapterModule();
    }
-   ng.injector( [ 'ng', ANGULAR_MODULE_NAME ] )
-      .invoke( [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
-         $controller = _$controller_;
-         $compile = _$compile_;
-         $rootScope = _$rootScope_;
 
-         $rootScope.i18n = {
-            locale: 'default',
-            tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
-         };
-      } ] );
+   // LaxarJS EventBus works with native promise.
+   // To be notified of eventBus ticks, install a listener.
+   laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
 
    ng.bootstrap( anchorElement, [ ANGULAR_MODULE_NAME ] );
 
@@ -205,8 +198,17 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
       const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
 
-      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] )
-         .run( [ '$q', '$rootScope', installAngularPromise ] )
+      ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
+         [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
+            $controller = _$controller_;
+            $compile = _$compile_;
+            $rootScope = _$rootScope_;
+            $rootScope.i18n = {
+               locale: 'default',
+               tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
+            };
+            installAngularPromise( $q, $rootScope );
+         } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
                const msg = exception.message || exception;

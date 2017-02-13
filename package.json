@@ -3,6 +3,7 @@
   "version": "2.0.0-pre",
   "description": "Write LaxarJS widgets and controls with AngularJS",
   "main": "laxar-angular-adapter.js",
+  "browser": "dist/laxar-angular-adapter.js",
   "scripts": {
     "prepublish": "npm run dist",
     "test": "grunt test && npm run eslint",
@@ -11,7 +12,7 @@
     "browser-spec-build": "cross-env NODE_ENV=browser-spec webpack",
     "browser-spec-start": "cross-env NODE_ENV=browser-spec webpack-dev-server --port 8085 --inline",
     "karma": "karma start karma.config.js",
-    "eslint": "eslint laxar-angular-adapter.js *.config.js  lib spec"
+    "eslint": "eslint laxar-angular-adapter.js *.config.js lib spec"
   },
   "repository": {
     "type": "git",
@@ -23,7 +24,7 @@
   "peerDependencies": {
      "angular": "^1.5.7",
      "angular-sanitize": "^1.5.7",
-     "laxar": "^2.0.0-alpha.14"
+     "laxar": "^2.0.0-alpha.15"
   },
   "keywords": [
     "LaxarJS",
@@ -64,6 +65,6 @@
     "laxar": "^2.0.0-alpha.14",
     "webpack": "^2.2.0",
     "webpack-dev-server": "^2.2.0",
-    "webpack-jasmine-html-runner-plugin": "^0.5.0"
+    "webpack-jasmine-html-runner-plugin": "^0.7.0"
   }
 }

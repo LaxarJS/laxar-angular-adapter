@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#25](https://github.com/LaxarJS/laxar-angular-adapter/issues/25): fixed testability by running $rootScope.$digest on heartbeat
+    + **BREAKING CHANGE:** see ticket for details
 - [#27](https://github.com/LaxarJS/laxar-angular-adapter/issues/27): initialize `$rootScope.i18n` exactly once
 - [#34](https://github.com/LaxarJS/laxar-angular-adapter/issues/34): project: updated dev-dependencies, upgraded to webpack 2
 - [#33](https://github.com/LaxarJS/laxar-angular-adapter/issues/33): fixed imports of `laxar-widget-service-mocks`

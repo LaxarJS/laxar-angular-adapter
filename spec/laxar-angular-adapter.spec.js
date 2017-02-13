@@ -30,6 +30,7 @@ const assets = {
 let widgetModule;
 let artifacts;
 let services;
+let registerHeartbeatListener;
 
 beforeEach( () => {
    widgetModule = ng.module( 'testWidget', [] );
@@ -40,7 +41,11 @@ beforeEach( () => {
       controls: []
    };
 
+   registerHeartbeatListener = jasmine.createSpy( 'registerHeartbeatListener' );
    services = {
+      heartbeat: {
+         registerHeartbeatListener
+      },
       configuration: createAxConfigurationMock(),
       log: createAxLogMock()
    };
@@ -59,21 +64,48 @@ describe( 'An angular widget adapter module', () => {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   describe( 'defines an $exceptionHandler provider', () => {
+   describe( 'when booststrapped', () => {
 
+      let $rootScope;
       let $timeout;
+      let heartbeatListener;
 
       beforeEach( () => {
          bootstrap( artifacts, services );
          module( ANGULAR_MODULE_NAME );
-         inject( _$timeout_ => {
+         inject( (_$rootScope_, _$timeout_) => {
+            $rootScope = _$rootScope_;
+            spyOn( $rootScope, '$digest' );
             $timeout = _$timeout_;
          } );
+         heartbeatListener = registerHeartbeatListener.calls.mostRecent().args[ 0 ];
       } );
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-      it( 'that overwrites the internal one with an implementation delegating to log.error', () => {
+      it( 'registers a heartbeat listener', () => {
+         expect( registerHeartbeatListener ).toHaveBeenCalledWith( jasmine.any( Function ) );
+      } );
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      describe( 'when the heartbeat listener is triggered', () => {
+
+         beforeEach( () => {
+            heartbeatListener();
+         } );
+
+         /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+         it( 'triggers a $rootScope $digest cycle', () => {
+            expect( $rootScope.$digest ).toHaveBeenCalled();
+         } );
+
+      } );
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      it( 'overwrites the AngularJS exception handler, delegating to log.error', () => {
          // simple way to trigger the $exceptionHandler
          $timeout( () => { throw new Error( 'my error' ); } );
          $timeout.flush();
