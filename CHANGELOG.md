@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#36](https://github.com/LaxarJS/laxar-angular-adapter/issues/36): testing: register angular modules with ngMocks
+
 
 ## v2.0.0-alpha.0
 

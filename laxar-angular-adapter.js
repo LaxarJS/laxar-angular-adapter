@@ -63,6 +63,13 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
       createAngularAdapterModule();
    }
 
+   if( ng.mock ) {
+      ng.mock.module( ANGULAR_SERVICES_MODULE_NAME );
+      ng.mock.module( ANGULAR_MODULE_NAME );
+      ( widgets ).concat( controls )
+         .forEach( _ => { ng.mock.module( _.module.name ); } );
+   }
+
    // LaxarJS EventBus works with native promise.
    // To be notified of eventBus ticks, install a listener.
    laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
