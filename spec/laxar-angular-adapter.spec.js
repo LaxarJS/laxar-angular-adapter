@@ -137,18 +137,6 @@ describe( 'An angular widget adapter', () => {
          release: jasmine.createSpy( 'widgetServices.release' )
       };
 
-      const widgetConfiguration = widgetData.configuration;
-      widgetServices.axContext = {
-         eventBus: widgetServices.axEventBus,
-         features: widgetServices.axFeatures,
-         id: widgetServices.axId,
-         widget: {
-            area: widgetConfiguration.area,
-            id: widgetConfiguration.id,
-            path: widgetConfiguration.widget
-         }
-      };
-
       spyOn( ng, 'bootstrap' ).and.callThrough();
    } );
 
@@ -175,9 +163,23 @@ describe( 'An angular widget adapter', () => {
          widgetName: widgetData.descriptor.name
       };
 
+      // emulate the way laxar widget services are created:
       const decorators = adapterFactory.serviceDecorators();
-      Object.keys( decorators ).forEach( name => {
-         environment.services[ name ] = decorators[ name ]( environment.services[ name ] );
+      Object.keys( decorators )
+         .filter( name => name !== 'axContext' )
+         .forEach( name => {
+            environment.services[ name ] = decorators[ name ]( environment.services[ name ] );
+         } );
+      const widgetConfiguration = widgetData.configuration;
+      widgetServices.axContext = decorators.axContext( {
+         eventBus: environment.services.axEventBus,
+         features: environment.services.axFeatures,
+         id: environment.services.axId,
+         widget: {
+            area: widgetConfiguration.area,
+            id: widgetConfiguration.id,
+            path: widgetConfiguration.widget
+         }
       } );
       adapter = adapterFactory.create( environment );
    } );
@@ -190,19 +192,26 @@ describe( 'An angular widget adapter', () => {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   it( 'schedules ES2015 promises through the $digest cycle', done => {
+   it( 'schedules a $digest cycle on completion of event bus promises', done => {
       inject( $rootScope => {
+         let triggered = false;
          let resolved = false;
-         Promise.resolve().then( () => {
+         $rootScope.$evalAsync = () => {
+            triggered = true;
+         };
+         injectedEventBus.publish( 'doSomething' ).then( () => {
             resolved = true;
          } );
+         expect( triggered ).toBe( false );
+         injectedEventBus.flush();
          setTimeout( () => {
-            expect( resolved ).toBe( false );
-            $rootScope.$digest();
             expect( resolved ).toBe( true );
+            expect( triggered ).toBe( true );
+            delete $rootScope.$evalAsync;
             done();
          }, 0 );
       } );
+
    } );
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,7 +226,7 @@ describe( 'An angular widget adapter', () => {
       ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
       it( 'injects the event bus instance for the widget as service (laxar#107)', () => {
-         expect( injectedEventBus ).toEqual( injectedScope.eventBus );
+         expect( injectedEventBus ).toBe( injectedScope.eventBus );
       } );
 
       ////////////////////////////////////////////////////////////////////////////////////////////////////////

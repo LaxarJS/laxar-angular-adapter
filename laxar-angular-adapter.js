@@ -82,6 +82,9 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    function serviceDecorators() {
       return {
+         axEventBus( eventBus ) {
+            return tapped( eventBus );
+         },
          axContext( context ) {
             return ng.extend( $rootScope.$new(), context );
          }
@@ -155,11 +158,41 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+   function tapped( eventBus ) {
+      return {
+         ...eventBus,
+         publish: ( ...args ) => tap( eventBus.publish( ...args ) ),
+         publishAndGatherReplies: ( ...args ) => tap( eventBus.publishAndGatherReplies( ...args ) )
+      };
+
+      function tap( promise ) {
+         promise.then = function( onFulfilled, onRejected ) {
+            return Promise.prototype.then.call( this, intercept( onFulfilled ), intercept( onRejected ) );
+         };
+         return promise;
+      }
+
+      function intercept( callback ) {
+         return typeof callback !== 'function' ?
+            callback :
+            ( ...args ) => {
+               try {
+                  return callback( ...args );
+               }
+               finally {
+                  $rootScope.$evalAsync( () => {} );
+               }
+            };
+      }
+   }
+
+   ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
    function createAngularServicesModule() {
       // Here we ensure availability of globally public laxar services for directives and other services
       ng.module( ANGULAR_SERVICES_MODULE_NAME, [] )
          .factory( 'axConfiguration', () => laxarServices.configuration )
-         .factory( 'axGlobalEventBus', () => laxarServices.globalEventBus )
+         .factory( 'axGlobalEventBus', () => tapped( laxarServices.globalEventBus ) )
          .factory( 'axGlobalLog', () => laxarServices.log )
          .factory( 'axGlobalStorage', () => laxarServices.storage )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )
@@ -206,7 +239,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
       const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
 
       ng.module( ANGULAR_MODULE_NAME, [ ...internalDependencies, ...externalDependencies ] ).run(
-         [ '$compile', '$controller', '$q', '$rootScope', ( _$compile_, _$controller_, $q, _$rootScope_ ) => {
+         [ '$compile', '$controller', '$rootScope', ( _$compile_, _$controller_, _$rootScope_ ) => {
             $controller = _$controller_;
             $compile = _$compile_;
             $rootScope = _$rootScope_;
@@ -214,7 +247,6 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
                locale: 'default',
                tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
             };
-            installAngularPromise( $q, $rootScope );
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
@@ -226,44 +258,6 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
          } );
 
    }
-
-}
-
-function installAngularPromise( $q, $rootScope ) {
-   if( !window.Zone ) {
-      const NativePromise = window.Promise;
-      window.Promise = $q;
-      window.Promise._reset = () => { window.Promise = NativePromise; };
-      return;
-   }
-
-   // When we got here, the angular2 adapter is most probably active as well and zone.js has installed its
-   // zone aware promise we cannot simply overwrite.
-   // So we need to hook into the then method and trigger a digest cycle whenever a promise is resolved.
-   const ZoneAwarePromise = window.Promise;
-   const ZoneAwarePromiseThen = ZoneAwarePromise.prototype.then;
-   ZoneAwarePromise.prototype.then = function( onFulfilled, onRejected ) {
-      return ZoneAwarePromiseThen.call( this, forward( onFulfilled ), forward( onRejected ) );
-
-      function forward( callback ) {
-         if( typeof callback !== 'function' ) {
-            return callback;
-         }
-
-         return ( ...args ) => {
-            try {
-               return callback( ...args );
-            }
-            finally {
-               $rootScope.$evalAsync( () => {} );
-            }
-         };
-      }
-   };
-   window.Promise._reset = () => {
-      ZoneAwarePromise.prototype.then = ZoneAwarePromiseThen;
-      delete window.Promise._reset;
-   };
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
