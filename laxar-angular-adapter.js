@@ -72,7 +72,10 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    // LaxarJS EventBus works with native promise.
    // To be notified of eventBus ticks, install a listener.
-   laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
+   laxarServices.heartbeat.registerHeartbeatListener( () => {
+      console.log( 'DELETE ME axHeartBeat' );
+      $rootScope.$digest();
+   } );
 
    ng.bootstrap( anchorElement, [ ANGULAR_MODULE_NAME ] );
 
@@ -230,20 +233,11 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 }
 
 function installAngularPromise( $q, $rootScope ) {
-   if( !window.Zone ) {
-      const NativePromise = window.Promise;
-      window.Promise = $q;
-      window.Promise._reset = () => { window.Promise = NativePromise; };
-      return;
-   }
-
-   // When we got here, the angular2 adapter is most probably active as well and zone.js has installed its
-   // zone aware promise we cannot simply overwrite.
-   // So we need to hook into the then method and trigger a digest cycle whenever a promise is resolved.
-   const ZoneAwarePromise = window.Promise;
-   const ZoneAwarePromiseThen = ZoneAwarePromise.prototype.then;
-   ZoneAwarePromise.prototype.then = function( onFulfilled, onRejected ) {
-      return ZoneAwarePromiseThen.call( this, forward( onFulfilled ), forward( onRejected ) );
+   // Hook into the then method and trigger a digest cycle whenever a promise is resolved.
+   const CustomPromise = window.Promise;
+   const CustomPromiseThen = CustomPromise.prototype.then;
+   CustomPromise.prototype.then = function( onFulfilled, onRejected ) {
+      return CustomPromiseThen.call( this, forward( onFulfilled ), forward( onRejected ) );
 
       function forward( callback ) {
          if( typeof callback !== 'function' ) {
@@ -261,7 +255,7 @@ function installAngularPromise( $q, $rootScope ) {
       }
    };
    window.Promise._reset = () => {
-      ZoneAwarePromise.prototype.then = ZoneAwarePromiseThen;
+      CustomPromise.prototype.then = CustomPromiseThen;
       delete window.Promise._reset;
    };
 }
