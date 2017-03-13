@@ -33,6 +33,11 @@ module.exports = function (grunt) {
                files: [ polyfillPath, 'lib/directives/spec/spec-runner.js' ]
             }
          },
+         filters: {
+            options: {
+               files: [ polyfillPath, 'lib/filters/spec/spec-runner.js' ]
+            }
+         },
          profiling: {
             options: {
                files: [ polyfillPath, 'lib/profiling/spec/spec-runner.js' ]
