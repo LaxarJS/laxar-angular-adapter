@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+
+## v2.0.0-alpha.2
+
 - [#38](https://github.com/LaxarJS/laxar-angular-adapter/issues/38): added axLocalize filter
 - [#37](https://github.com/LaxarJS/laxar-angular-adapter/issues/37): fixed promise/digest integration
 
