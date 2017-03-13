@@ -23,7 +23,8 @@ import { assert } from 'laxar';
 import { name as idModuleName } from './lib/directives/id';
 import { name as widgetAreaModuleName } from './lib/directives/widget_area';
 import { name as profilingModuleName } from './lib/profiling/profiling';
-import { name as axVisibilityServiceModuleName } from './lib/services/visibility_service';
+import { name as visibilityServiceModuleName } from './lib/services/visibility_service';
+import { name as localizeModuleName } from './lib/filters/localize';
 
 // exported for unit tests
 export const ANGULAR_SERVICES_MODULE_NAME = 'axAngularGlobalServices';
@@ -232,8 +233,9 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
          ANGULAR_SERVICES_MODULE_NAME,
          idModuleName,
          widgetAreaModuleName,
+         localizeModuleName,
          profilingModuleName,
-         axVisibilityServiceModuleName
+         visibilityServiceModuleName
       ];
 
       const externalDependencies = ( widgets ).concat( controls ).map( _ => _.module.name );
@@ -243,10 +245,6 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
             $controller = _$controller_;
             $compile = _$compile_;
             $rootScope = _$rootScope_;
-            $rootScope.i18n = {
-               locale: 'default',
-               tags: laxarServices.configuration.get( 'i18n.locales', { 'default': 'en' } )
-            };
          } ] )
          .factory( '$exceptionHandler', () => {
             return ( exception, cause ) => {
