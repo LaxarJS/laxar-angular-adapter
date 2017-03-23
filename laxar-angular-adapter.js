@@ -83,9 +83,8 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    function serviceDecorators() {
       return {
-         axEventBus( eventBus ) {
-            return tapped( eventBus );
-         },
+         axGlobalEventBus: decorateEventBusForDigest,
+         axEventBus: decorateEventBusForDigest,
          axContext( context ) {
             return ng.extend( $rootScope.$new(), context );
          }
@@ -159,17 +158,15 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   function tapped( eventBus ) {
-      return {
-         ...eventBus,
-         publish: ( ...args ) => tap( eventBus.publish( ...args ) ),
-         publishAndGatherReplies: ( ...args ) => tap( eventBus.publishAndGatherReplies( ...args ) )
-      };
+   function decorateEventBusForDigest( eventBus ) {
+      const result = Object.create( eventBus );
+      result.publish = ( ...args ) => tap( eventBus.publish( ...args ) );
+      result.publishAndGatherReplies = ( ...args ) => tap( eventBus.publishAndGatherReplies( ...args ) );
+      return result;
 
       function tap( promise ) {
-         promise.then = function( onFulfilled, onRejected ) {
-            return Promise.prototype.then.call( this, intercept( onFulfilled ), intercept( onRejected ) );
-         };
+         promise.then = ( onFulfilled, onRejected ) =>
+            Promise.prototype.then.call( promise, intercept( onFulfilled ), intercept( onRejected ) );
          return promise;
       }
 
@@ -193,7 +190,7 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
       // Here we ensure availability of globally public laxar services for directives and other services
       ng.module( ANGULAR_SERVICES_MODULE_NAME, [] )
          .factory( 'axConfiguration', () => laxarServices.configuration )
-         .factory( 'axGlobalEventBus', () => tapped( laxarServices.globalEventBus ) )
+         .factory( 'axGlobalEventBus', () => decorateEventBusForDigest( laxarServices.globalEventBus ) )
          .factory( 'axGlobalLog', () => laxarServices.log )
          .factory( 'axGlobalStorage', () => laxarServices.storage )
          .factory( 'axHeartbeat', () => laxarServices.heartbeat )

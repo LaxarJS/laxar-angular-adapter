@@ -2,26 +2,25 @@
 
 > Write LaxarJS widgets and controls with AngularJS
 
-Starting with LaxarJS 2, AngularJS is no longer supported (and included) by default.
-However, this widget-adapter for LaxarJS 2 allows to use widgets written in AngularJS 1.x with LaxarJS 2.
+Starting with LaxarJS 2, AngularJS is no longer supported (nor included) by default.
+However, this widget-adapter for LaxarJS 2 allows to use widgets written in AngularJS 1.x within LaxarJS 2 applications.
 
-To use the adapter, install it using Bower or npm, and then pass it to `laxar.bootstrap`.
+To use the adapter, install it from NPM:
+
+```console
+npm install --save laxar-angular-adapter
+```
+
+Then pass it to `laxar.bootstrap`:
+
+```js
+import * as angularAdapter from 'laxar-angular-adapter';
+import { bootstrap } from 'laxar';
+bootstrap( { widgetAdapters: [ angularAdapter ] /*, artifacts: ..., configuration: ... */ } );
+```
 
 Note that AngularJS 1.x is not well suited to multiple LaxarJS application instances sharing a page.
-If you need this feature, be sure to pass the AngularJS dependencies of all instances as modules to the first `laxar.bootstrap` invocation.
-
-
-## Additionally provided injectable services
-
-Most services available as injection for widgets are directly provided by the LaxarJS runtime (see http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services).
-In case of this adapter some services are only redefined as AngularJS services to be globally available for other AngularJS services and directives.
-The following list covers these:
-* [`axConfiguration`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axconfiguration-)
-* [`axGlobalEventBus`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axglobaleventbus-)
-* [`axGlobalLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axgloballog-)
-* [`axGlobalStorage`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axglobalstorage-)
-* [`axHeartbeat`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axheartbeat-)
-* [`axTooling`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axtooling-)
+If you need this feature, be sure to pass the AngularJS dependencies of all instances as modules to the first `bootstrap` invocation.
 
 
 ### axWidgetServices
@@ -48,3 +47,18 @@ myModule.directive( 'myDirective', [ 'axWidgetServices', axWidgetServices => {
 As it is always the case for controllers, the `$scope` the controller is bound to can be injected.
 For AngularJS widgets this is exactly the same as the [`axContext`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axcontext-) injection.
 All widget scopes are child of one specific parent scope and don't copy the hierarchy or placement of widgets within a page, i.e. all widget scopes are siblings of each other.
+
+
+## Global LaxarJS Service Injections
+
+Most services available as injection for widgets are directly provided by the LaxarJS runtime (see http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services).
+In case of this adapter some services are only redefined as AngularJS services to be globally available for other AngularJS services and directives.
+
+The following list covers these:
+
+   * [`axConfiguration`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axconfiguration-)
+   * [`axGlobalEventBus`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axglobaleventbus-)
+   * [`axGlobalLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axgloballog-)
+   * [`axGlobalStorage`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axglobalstorage-)
+   * [`axHeartbeat`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axheartbeat-)
+   * [`axTooling`](http://laxarjs.org/docs/laxar-v2-latest/manuals/widget_services#-axtooling-)

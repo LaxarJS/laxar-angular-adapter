@@ -132,6 +132,7 @@ describe( 'An angular widget adapter', () => {
       widgetServices = {
          axContext: null,
          axEventBus: createAxEventBusMock(),
+         axGlobalEventBus: createAxEventBusMock(),
          axFeatures: { myProp: 'x' },
          axId: () => 'fake-id',
          release: jasmine.createSpy( 'widgetServices.release' )
@@ -145,14 +146,17 @@ describe( 'An angular widget adapter', () => {
    let adapter;
    let injectedScope;
    let injectedEventBus;
+   let injectedGlobalEventBus;
    let injectedContext;
 
    beforeEach( () => {
-      widgetModule.controller( 'TestWidgetController', ( $scope, axEventBus, axContext ) => {
+      const controller = ( $scope, axEventBus, axGlobalEventBus, axContext ) => {
          injectedScope = $scope;
          injectedEventBus = axEventBus;
+         injectedGlobalEventBus = axGlobalEventBus;
          injectedContext = axContext;
-      } );
+      };
+      widgetModule.controller( 'TestWidgetController', controller );
       module( ANGULAR_MODULE_NAME );
       const adapterFactory = bootstrap( artifacts, services );
 
@@ -192,24 +196,51 @@ describe( 'An angular widget adapter', () => {
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-   it( 'schedules a $digest cycle on completion of event bus promises', done => {
-      inject( $rootScope => {
-         let triggered = false;
-         let resolved = false;
-         $rootScope.$evalAsync = () => {
-            triggered = true;
-         };
-         injectedEventBus.publish( 'doSomething' ).then( () => {
-            resolved = true;
-         } );
-         expect( triggered ).toBe( false );
+   describe( 'on completion of an event bus promise', () => {
+
+      let resolveSpy;
+      let rootScope;
+
+      beforeEach( done => {
+         inject( $rootScope => { rootScope = $rootScope; } );
+         resolveSpy = jasmine.createSpy( 'resolveSpy' );
+         rootScope.$evalAsync = jasmine.createSpy( '$evalAsync' );
+         injectedEventBus.publish( 'doSomething' ).then( resolveSpy );
+         expect( rootScope.$evalAsync ).not.toHaveBeenCalled();
+         expect( resolveSpy ).not.toHaveBeenCalled();
+
          injectedEventBus.flush();
-         setTimeout( () => {
-            expect( resolved ).toBe( true );
-            expect( triggered ).toBe( true );
-            delete $rootScope.$evalAsync;
-            done();
-         }, 0 );
+         setTimeout( done, 0 );
+      } );
+
+      afterEach( () => {
+         delete rootScope.$evalAsync;
+      } );
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      it( 'schedules a $digest cycle', () => {
+         expect( rootScope.$evalAsync ).toHaveBeenCalled();
+         expect( resolveSpy ).toHaveBeenCalled();
+      } );
+
+      describe( 'then on completion of a global event bus promise', () => {
+
+         beforeEach( done => {
+            rootScope.$evalAsync.calls.reset();
+            resolveSpy.calls.reset();
+            injectedGlobalEventBus.publish( 'doSomething' ).then( resolveSpy );
+            injectedGlobalEventBus.flush();
+            setTimeout( done, 0 );
+         } );
+
+         /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+         it( 'schedules another $digest cycle', () => {
+            expect( rootScope.$evalAsync ).toHaveBeenCalled();
+            expect( resolveSpy ).toHaveBeenCalled();
+         } );
+
       } );
 
    } );
