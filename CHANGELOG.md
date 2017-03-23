@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+
+## v2.0.0-beta.0
+
 - [#35](https://github.com/LaxarJS/laxar-angular-adapter/issues/35): documentation: completed README.md
 - [#39](https://github.com/LaxarJS/laxar-angular-adapter/issues/39): fixed decoration of axGlobalEventBus
 
