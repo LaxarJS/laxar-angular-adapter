@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#40](https://github.com/LaxarJS/laxar-angular-adapter/issues/40): fixed running multiple bootstrapping instances
+
 
 ## v2.0.0-beta.0
 

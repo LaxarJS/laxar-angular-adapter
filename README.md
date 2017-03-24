@@ -15,8 +15,8 @@ Then pass it to `laxar.bootstrap`:
 
 ```js
 import * as angularAdapter from 'laxar-angular-adapter';
-import { bootstrap } from 'laxar';
-bootstrap( { widgetAdapters: [ angularAdapter ] /*, artifacts: ..., configuration: ... */ } );
+import { create } from 'laxar';
+create( [ angularAdapter ] /*, artifacts: ..., configuration: ... */ ).flow().bootstrap();
 ```
 
 To make LaxarJS use this adapter for your widget, set the `integration.technology` in the `widget.json` descriptor to `"angular"`:
