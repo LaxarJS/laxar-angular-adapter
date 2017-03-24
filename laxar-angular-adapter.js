@@ -36,9 +36,13 @@ export const technology = 'angular';
 // so we keep certain injections global.
 let injectorCreated = false;
 
+let $rootScope;
+let $controller;
+let $compile;
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function bootstrap( { widgets, controls }, laxarServices, anchorElement ) {
+export function bootstrap( { widgets, controls }, laxarServices ) {
 
    const api = {
       create,
@@ -53,9 +57,6 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
 
    const activeWidgetServices = {};
 
-   let $controller;
-   let $compile;
-   let $rootScope;
 
    // Instantiate the AngularJS modules and bootstrap angular, but only the first time!
    if( !injectorCreated ) {
@@ -75,6 +76,9 @@ export function bootstrap( { widgets, controls }, laxarServices, anchorElement )
    // To be notified of eventBus ticks, install a listener.
    laxarServices.heartbeat.registerHeartbeatListener( () => { $rootScope.$digest(); } );
 
+   const anchorElement = document.createElement( 'DIV' );
+   anchorElement.style.display = 'none';
+   document.body.appendChild( anchorElement );
    ng.bootstrap( anchorElement, [ ANGULAR_MODULE_NAME ] );
 
    return api;
