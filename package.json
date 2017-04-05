@@ -23,7 +23,6 @@
   },
   "peerDependencies": {
      "angular": "^1.5.7",
-     "angular-sanitize": "^1.5.7",
      "laxar": "^2.0.0-alpha.19"
   },
   "keywords": [
@@ -40,7 +39,6 @@
   "homepage": "https://github.com/LaxarJS/laxar-angular-adapter#readme",
   "devDependencies": {
     "angular": "^1.5.7",
-    "angular-sanitize": "^1.5.7",
     "angular-mocks": "^1.5.7",
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",

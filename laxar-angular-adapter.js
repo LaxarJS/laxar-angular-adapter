@@ -18,7 +18,6 @@
  */
 
 import ng from 'angular';
-import ngSanitizeModule from 'angular-sanitize';
 import { assert } from 'laxar';
 import { name as idModuleName } from './lib/directives/id';
 import { name as widgetAreaModuleName } from './lib/directives/widget_area';
@@ -230,7 +229,6 @@ export function bootstrap( { widgets, controls }, laxarServices ) {
    function createAngularAdapterModule() {
 
       const internalDependencies = [
-         ngSanitizeModule.name || 'ngSanitize',
          ANGULAR_SERVICES_MODULE_NAME,
          idModuleName,
          widgetAreaModuleName,

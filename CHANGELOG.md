@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#41](https://github.com/LaxarJS/laxar-angular-adapter/issues/41): removed angular-sanitize as dependency
+    + **BREAKING CHANGE:** see ticket for details
 - [#40](https://github.com/LaxarJS/laxar-angular-adapter/issues/40): fixed running multiple bootstrapping instances
 
 

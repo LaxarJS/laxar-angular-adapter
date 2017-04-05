@@ -15,8 +15,7 @@ const isBrowserSpec = nodeEnv === 'browser-spec';
 const name = require( './package.json' ).name;
 const externals = {
    'laxar': 'laxar',
-   'angular': 'angular',
-   'angular-sanitize': 'angular-sanitize'
+   'angular': 'angular'
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
