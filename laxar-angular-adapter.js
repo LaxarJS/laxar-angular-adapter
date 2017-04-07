@@ -262,9 +262,6 @@ export function bootstrap( { widgets, controls }, laxarServices ) {
 // For testing, to reset the global AngularJS module state:
 export function reset() {
    injectorCreated = false;
-   if( typeof window.Promise._reset === 'function' ) {
-      window.Promise._reset();
-   }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

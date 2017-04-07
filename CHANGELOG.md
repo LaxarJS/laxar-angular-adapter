@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+- [#42](https://github.com/LaxarJS/laxar-angular-adapter/issues/42): removed remnants of promise-patching
+
+
 ## v2.0.0-beta.1
 
 - [#41](https://github.com/LaxarJS/laxar-angular-adapter/issues/41): removed angular-sanitize as dependency
