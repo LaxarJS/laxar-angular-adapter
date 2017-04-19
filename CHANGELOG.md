@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#43](https://github.com/LaxarJS/laxar-angular-adapter/issues/43): use laxar-infrastructure
 - [#42](https://github.com/LaxarJS/laxar-angular-adapter/issues/42): removed remnants of promise-patching
 
 

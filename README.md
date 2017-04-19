@@ -213,3 +213,37 @@ Here are some AngularJS-specific hints for testing:
    - If your are using `$http`, use `axMocks.widget.whenServicesAvailable` to inject and configure `$httpBackend`.
      Trying to inject AngularJS services into your test too early can lead to problems when LaxarJS injections are prepared,
    - when `eventBus.flush()` is run to trigger event bus delivery, a `$rootScope.$digest` is  automatically initiated afterwards.
+
+
+## Hacking the Adapter
+
+First, clone the repository and fetch the dependencies:
+
+```console
+git clone https://github.com/LaxarJS/laxar-angular-adapter.git
+cd laxar-angular-adapter
+npm install
+```
+
+To rebuild the _pre-compiled bundle_, use:
+
+```console
+npm run dist
+```
+
+Otherwise, you may need to adjust your project to load the adapter with ES2015 support.
+To pick up clone from within a LaxarJS application, you may need to modify the project's webpack resolve configuration.
+
+To _test_ the adapter, run:
+
+```console
+npm test
+```
+
+For interactive tests that can be inspected in the browser, run:
+
+```console
+npm start
+```
+
+Now you can access the spec-tests at http://localhost:8080/dist/spec/laxar-angular-adapter.spec.html
