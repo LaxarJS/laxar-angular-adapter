@@ -24,7 +24,7 @@
   "dependencies": {},
   "peerDependencies": {
      "angular": "^1.5.7",
-     "laxar": "^2.0.0"
+     "laxar": "^2.0.0-rc.3"
   },
   "keywords": [
     "LaxarJS",
@@ -45,14 +45,12 @@
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-object-rest-spread": "^6.20.1",
     "babel-preset-es2015": "^6.18.0",
-    "eslint": "^3.13.1",
-    "eslint-config-laxarjs": "^0.3.0",
     "eslint": "^3.18.0",
-    "eslint-config-laxarjs": "^0.4.0",
+    "eslint-config-laxarjs": "^2.0.0-rc.0",
     "karma": "^1.5.0",
-    "laxar": "^2.0.0-alpha.20",
-    "laxar-infrastructure": "^2.0.0",
-    "laxar-loader": "^2.0.0",
+    "laxar": "^2.0.0-rc.3",
+    "laxar-infrastructure": "^2.0.0-rc.1",
+    "laxar-loader": "^2.0.0-rc.3",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.5.0",
     "webpack-jasmine-html-runner-plugin": "^0.7.0"
