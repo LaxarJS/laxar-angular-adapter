@@ -2,6 +2,10 @@
 
 > Write LaxarJS widgets and controls with AngularJS
 
+<span class="laxar-external-documentation-hint">
+   Take a look at the <a href="https://www.laxarjs.org/docs/laxar-latest/">documentation site</a> to browse documentation for all releases of this artifact.
+</span>
+
 Starting with LaxarJS 2, AngularJS support is no longer included out-of-the-box.
 However, this widget-adapter for LaxarJS 2 allows to use widgets written in AngularJS 1.x within LaxarJS 2 applications.
 
@@ -210,9 +214,9 @@ You can use the integration technology `"angular"` together with [laxar-mocks](l
 
 Here are some AngularJS-specific hints for testing:
 
-   - If your are using `$http`, use `axMocks.widget.whenServicesAvailable` to inject and configure `$httpBackend`.
-     Trying to inject AngularJS services into your test too early can lead to problems when LaxarJS injections are prepared,
-   - when `eventBus.flush()` is run to trigger event bus delivery, a `$rootScope.$digest` is  automatically initiated afterwards.
+- If your are using `$http`, use `axMocks.widget.whenServicesAvailable` to inject and configure `$httpBackend`.
+  Trying to inject AngularJS services into your test too early can lead to problems when LaxarJS injections are prepared,
+- when `eventBus.flush()` is run to trigger event bus delivery, a `$rootScope.$digest` is  automatically initiated afterwards.
 
 
 ## Hacking the Adapter

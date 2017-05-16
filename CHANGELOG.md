@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#44](https://github.com/LaxarJS/laxar-angular-adapter/issues/44): documentation: fixed list indention
+
 
 ## v2.0.0-rc.0
 
