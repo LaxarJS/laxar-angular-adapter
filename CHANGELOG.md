@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+
+## v2.0.0-rc.1
+
 - [#45](https://github.com/LaxarJS/laxar-angular-adapter/issues/45): fixed dependencies in package.json
 - [#44](https://github.com/LaxarJS/laxar-angular-adapter/issues/44): documentation: fixed list indention
 
