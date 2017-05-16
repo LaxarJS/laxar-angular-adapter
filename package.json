@@ -52,7 +52,7 @@
     "laxar-infrastructure": "^2.0.0-rc.1",
     "laxar-loader": "^2.0.0-rc.3",
     "webpack": "^2.4.1",
-    "webpack-dev-server": "^2.5.0",
+    "webpack-dev-server": "^2.4.5",
     "webpack-jasmine-html-runner-plugin": "^0.7.0"
   }
 }
