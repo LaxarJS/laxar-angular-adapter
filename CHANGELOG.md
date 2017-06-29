@@ -3,6 +3,7 @@
 ## Last Changes
 
 
+## v2.0.0
 ## v2.0.0-rc.1
 
 - [#45](https://github.com/LaxarJS/laxar-angular-adapter/issues/45): fixed dependencies in package.json
