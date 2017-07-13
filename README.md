@@ -11,7 +11,7 @@ However, this widget-adapter for LaxarJS 2 allows to use widgets written in Angu
 
 To use the adapter, install it from NPM:
 
-```console
+```sh
 npm install --save laxar-angular-adapter
 ```
 
@@ -48,9 +48,9 @@ Because the integration technology `"angular"` was built into LaxarJS v1, the [m
 
 To recapitulate the basics for widgets:
 
-   - each widget implementation module must create an AngularJS module named after the widget, except that `camelCase` should be used for the module, to adhere to the AngularJS naming guidelines,
-   - the module name must be exported using the export `name`,
-   - the widget controller function must be registered using `.controller` on the widget's AngularJS module, and its name must correspond to the module name: for a module named `myWidget`, the controller must be named `MyWidgetController`.
+- each widget implementation module must create an AngularJS module named after the widget, except that `camelCase` should be used for the module, to adhere to the AngularJS naming guidelines,
+- the module name must be exported using the export `name`,
+- the widget controller function must be registered using `.controller` on the widget's AngularJS module, and its name must correspond to the module name: for a module named `myWidget`, the controller must be named `MyWidgetController`.
 
 When using the LaxarJS generator for Yeoman, a suitable implementation module will be prepared for you automatically.
 
@@ -110,11 +110,11 @@ Widgets service injections are created by the LaxarJS runtime as their widget co
 
 The AngularJS adapter provides additional globally available service injections that can be used in any AngularJS injection context:
 
-   * [`axConfiguration`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axConfiguration) to access the application configuration
-   * [`axGlobalEventBus`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axGlobalEventBus) to inspect the event bus independent of widget or page lifetimes
-   * [`axGlobalLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axGlobalLog) to use or listen to the log, application-wide
-   * [`axGlobalStorage`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#aGlobalStorage) for application-wide local- or session-storage
-   * [`axHeartbeat`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axHeartbeat) to be notified whenever events were delivered
+- [`axConfiguration`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axConfiguration) to access the application configuration
+- [`axGlobalEventBus`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axGlobalEventBus) to inspect the event bus independent of widget or page lifetimes
+- [`axGlobalLog`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axGlobalLog) to use or listen to the log, application-wide
+- [`axGlobalStorage`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#aGlobalStorage) for application-wide local- or session-storage
+- [`axHeartbeat`](http://laxarjs.org/docs/laxar-v2-latest/manuals/runtime.widget_services.md#axHeartbeat) to be notified whenever events were delivered
 
 
 ## Additional Filters Provided by LaxarJS
@@ -223,7 +223,7 @@ Here are some AngularJS-specific hints for testing:
 
 First, clone the repository and fetch the dependencies:
 
-```console
+```sh
 git clone https://github.com/LaxarJS/laxar-angular-adapter.git
 cd laxar-angular-adapter
 npm install
@@ -231,7 +231,7 @@ npm install
 
 To rebuild the _pre-compiled bundle_, use:
 
-```console
+```sh
 npm run dist
 ```
 
@@ -240,13 +240,13 @@ To pick up clone from within a LaxarJS application, you may need to modify the p
 
 To _test_ the adapter, run:
 
-```console
+```sh
 npm test
 ```
 
 For interactive tests that can be inspected in the browser, run:
 
-```console
+```sh
 npm start
 ```
 
