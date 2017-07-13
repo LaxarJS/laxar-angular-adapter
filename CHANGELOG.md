@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+
+## v2.0.1
+
 - [#46](https://github.com/LaxarJS/laxar-angular-adapter/issues/46): fixed markdown syntax in readme
 
 
